@@ -6,6 +6,9 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>Hello</h1>
+    <h1>wholEArtidley</h1>
+    <h2>Where feelings meet expression</h2>
+    <img src="images/logo/dark1.png" id="visual1"/>
+    <button id="join1">Join us now</button>
 </body>
 </html>
