@@ -6,6 +6,7 @@
     <title>Splash</title>
     <meta name="Author" content="James Cooks u21654680">
     <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="css/splash.css">
 </head>
 <body>
     <div id="beforeFold">
@@ -20,6 +21,10 @@
         </div>
         <button id="join1" class="signUp">Join us now</button>
         <div id="socialProof">
+            <h2>What our users are saying</h2>
+            <img class="tweet" src="images\socialProof\bill.png" alt="Bill Gates">
+            <img class="tweet" src="images\socialProof\barack.png" alt="Barack Obama">
+            <img class="tweet" src="images\socialProof\warren.png" alt="Warren Buffet">
         </div>
     </div>
     <div id="afterFold">
