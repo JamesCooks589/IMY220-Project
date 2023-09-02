@@ -1,7 +1,150 @@
-#beforeFold{
-    height : 100vh;
+body{
+    margin: 0;
+    padding: 0;
+    font-family: 'Raleway', sans-serif;
+    background-color: #2f424f;
+    color: white;
 }
 
-#features{
+#beforeFold{
     height : 100vh;
+    margin-bottom: 2%;
 }
+
+#topRight{
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+    margin-top: 1%;
+}
+
+#login {
+    background-color: #2634c3;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    display: block;
+    width: 10%;
+    margin-right: 1%;
+  }
+
+#signup{
+    background-color: #2634c3;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    display: block;
+    width: 10%;
+}
+
+.title {
+        font-size: 150px;
+        background: rgb(214,201,0);
+        background: linear-gradient(90deg, rgba(214,201,0,1) 3%, rgba(38,52,195,1) 59%, rgba(0,212,255,1) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-family: 'Exo 2', sans-serif;
+}
+
+.subtitle{
+    font-size: 100px;
+    background: rgb(214,201,0);
+    background: linear-gradient(270deg, rgba(214,201,0,1) 3%, rgba(38,52,195,1) 59%, rgba(0,212,255,1) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-family: 'Raleway', sans-serif;
+}
+
+#visual1{
+    max-width: 100%;
+    margin-right: 5%;
+}
+
+#foldContent {
+    display: flex;
+    align-items: center;
+}
+
+#foldHeaders{
+    display: flex;
+    flex-direction: column;
+    margin-left: 10%;
+}
+
+#socialTitle{
+    text-align: center;
+    margin-bottom: 2%;
+}
+#socialProof{
+    display: flex;
+    justify-content: space-between;
+    margin-left: 2%;
+    margin-right: 2%;
+}
+
+#socialProof img{
+    box-shadow: 0 0 10px 0 rgba(0,0,0,0.5);
+}
+
+#features {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 5%;
+    
+}
+
+
+#CTA {
+    display: flex;
+    margin-top: 2%;
+    margin-left: 10%;
+    flex-direction: column;
+    width: 50%;
+}
+
+.signUp {
+    background-color: #2634c3;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    display: block;
+    width: 20%;
+  }
+
+  #CTA2 {
+    display: flex;
+    margin: 2% auto;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+  }
+
+  #join2 {
+    width: 10%;
+    align-self: center;
+  }
+
+  #faqAccordion {
+    width: 50%;
+    margin: 0 auto;
+  }
+
+  .accordion-button {
+    background-color: #555555;
+    color: white;
+  }
+
+  .accordion-button:not(.collapsed) {
+    background-color: #555555;
+    color: white;
+  }
+  
+
+  .modal-body, .modal-header, .form-control {
+    background-color: #555555;
+  }
