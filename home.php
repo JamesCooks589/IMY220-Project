@@ -1,6 +1,6 @@
 <?php 
     session_start();
-    $mysqli = new mysqli("localhost", "u21654680", "urspmqds", "u21654680");
+    $mysqli = new mysqli("localhost", "root", "", "wholeartedly");
     if($mysqli->connect_error){
       die("Connection failed: " . $mysqli->connect_error);
     }
@@ -13,12 +13,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Home</title>
   <link rel="icon" type="image/x-icon" href="images/favicon.ico">
-  <!-- Include Bootstrap CSS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
-  <!--Line Icons-->
-  <link href="https://cdn.lineicons.com/4.0/lineicons.css" rel="stylesheet">
-  <!--EXO2-->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <!--Line Icons-->
+    <link href="https://cdn.lineicons.com/4.0/lineicons.css" rel="stylesheet">
+    <!--EXO2-->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Exo+2&display=swap" rel="stylesheet">
     <!--Raleway-->
@@ -129,12 +129,14 @@
                     <div class="mb-3">
                         <label for="categorySelect" class="form-label">Category</label>
                         <select class="form-select" id="categorySelect" name="categorySelect" required>
+                          <!--Ordered alphabetically-->
                         <option value="" disabled selected>Select a category</option>
                           <option value="visual_art">Visual Art</option>
                           <option value="sculpture">Sculpture</option>
                           <option value="music">Music</option>
                           <option value="literature">Literature</option>
                           <option value="performing_art">Performing Art</option>
+                          <option value="theatre">Theatre</option>
                           <option value="film">Film</option>
                           <option value="architecture">Architecture</option>
                           <option value="fashion">Fashion</option>

@@ -213,7 +213,7 @@
 
     //Connect to database
 
-    $mysqli = new mysqli("localhost", "u21654680", "urspmqds", "u21654680");
+    $mysqli = new mysqli("localhost", "root", "", "wholeartedly");
 
     //If connect successfully echo "Connected"
     if($mysqli){
