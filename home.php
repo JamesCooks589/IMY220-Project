@@ -4,7 +4,7 @@
     if($mysqli->connect_error){
       die("Connection failed: " . $mysqli->connect_error);
     }
-  ?>
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -23,8 +23,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Exo+2&display=swap" rel="stylesheet">
     <!--Raleway-->
     <link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet">
-  <!-- CSS -->
-  <link href="css/home.css" type="text/css" rel="stylesheet">
+    <!-- CSS -->
+    <link href="css/home.css" type="text/css" rel="stylesheet">
+    <!-- JS -->
+    <!--Jquery-->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
 </head>
 <body>
   <!-- Banner with and Profile Picture -->
@@ -34,6 +38,7 @@
         <button class="btn btn-primary inactive" id="local">Local</button>
         <button class="btn btn-primary active" id="global">Global</button>
     </div>
+    
     <img src="images/profilePictures/placeholder.jpg" alt="Profile Picture" class="img-fluid rounded-circle" id="profile-pic">
   </nav>
   <!-- Body content -->
@@ -66,12 +71,15 @@
                     echo "<h5 class='card-title title'>".$row["title"]."</h5>";
                     echo "<h6 class='card-subtitle mb-2 '>".$row["author"]."</h6>";
                     echo "<h6 class='card-subtitle mb-2 '>".$row["date"]."</h6>";
+                    //Hidden element for id
+                    echo "<p class='card-text id' hidden>".$row["article_id"]."</p>";
+                    
+                    echo "<p class='card-text'>".$row["summary"]."</p>";
                     echo "<div class='hashtags'>";
                     foreach($hashtags as $hashtag){
                       echo "<span class='badge hashtag'>".$hashtag."</span>";
                     }
                     echo "</div>";
-                    echo "<p class='card-text'>".$row["summary"]."</p>";
                     echo "</div>";
                     echo "</div>";
                     echo "</div>";
@@ -190,10 +198,11 @@
           echo "<script>window.location.href='home.php'</script>";
 
         }
+
+        echo "<script src='js/home.js'></script>";
   ?>
 
   <!-- Include Bootstrap JavaScript -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
-
 </body>
 </html>
