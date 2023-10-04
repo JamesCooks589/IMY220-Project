@@ -35,6 +35,7 @@
   <img src="images/starry_night.png" alt="Banner" class="img-fluid">
   <nav>
   <div id="feeds">
+      
         <button class="btn btn-primary inactive" id="local">Local</button>
         <button class="btn btn-primary active" id="global">Global</button>
     </div>
