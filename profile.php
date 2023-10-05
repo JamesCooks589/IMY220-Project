@@ -47,24 +47,27 @@
     </head>
     <body>
         <img src="images/starry_night.png" alt="Banner" class="img-fluid">
+        <div id = "logoContainer">
+            <a href="home.php"><img src="images/logo/dark1.png" alt="Whole Artedly Logo" class="img-fluid logo"></a>
         <?php if($_SESSION['id'] == $userID){ 
-                echo 'Hello ' . $_SESSION['username'] . '!';
+                echo '<h1>Hello ' . $_SESSION['username'] . '!</h1>';
             }else{
-                echo 'Say hello to ' . $row['username'] . '!';
+                echo '<h1>Say hello to ' . $row['username'] . '!</h1>';
                 //If user is not friends with the profile they are viewing, show add friend button or if they are friends, show remove friend button
                 $friends = $row['friends'];
                 $friendsArray = explode(',', $friends);
                 if(!in_array($_SESSION['id'], $friendsArray)){
-                    echo '<form action="" method="POST"><input type="hidden" name="userID" value="' . $userID . '"><button class="btn btn-primary" name="addFriend">Add Friend</button></form>';
+                    echo '<form action="" method="POST"><input type="hidden" name="userID" value="' . $userID . '"><button class="btn btn-primary addFriend" name="addFriend">Add Friend</button></form>';
                 }else{
-                    echo '<form action="" method="POST"><input type="hidden" name="userID" value="' . $userID . '"><button class="btn btn-primary" name="removeFriend">Remove Friend</button></form>';
+                    echo '<form action="" method="POST"><input type="hidden" name="userID" value="' . $userID . '"><button class="btn btn-primary removeFriend" name="removeFriend">Remove Friend</button></form>';
                     //Message button
-                    echo '<form action="messages.php" method="POST"><input type="hidden" name="userID" value="' . $userID . '"><button class="btn btn-primary" name="message">Message</button></form>';
+                    echo '<form action="messages.php" method="POST"><input type="hidden" name="userID" value="' . $userID . '"><button class="btn btn-primary message" name="message">Message</button></form>';
                 }
             }
 
 
         ?>
+        </div>
         <div class="container">
             <div class="row">
                 <!--2 columns-->
@@ -93,6 +96,7 @@
                                 echo '</div>';
                                 echo '<div class="modal-body">';
                                 echo '<form action="" method="POST" enctype="multipart/form-data">';
+                                echo '<input type="hidden" name="userID" value="' . $userID . '">'; //hidden input for userID
                                 echo '<div class="mb-3">';
                                 echo '<label for="profilePicture" class="form-label">Profile Picture</label>';
                                 echo '<input type="file" class="form-control" id="profilePicture" name="profilePicture">';
@@ -134,16 +138,16 @@
                 </div>
                 <!--Right column for articles and lists-->
                 <!--Only show lists if the userID and session id are the same-->
-                <div class="col-md-8">
+                <div class="col-md-8 articleAndList">
                     <?php 
                         //If the user is owner of profile display toggle button between lists and articles
                         if($userID == $_SESSION['id']){
                             echo '<div class="toggle">';
-                            echo '<button class="btn btn-primary" id="articles">Articles</button>';
-                            echo '<button class="btn btn-primary" id="lists">Lists</button>';
+                            echo '<button class="btn btn-primary active" id="articles">Articles</button>';
+                            echo '<button class="btn btn-primary inactive" id="lists">Lists</button>';
                             echo '</div>';
                         }
-                        echo '<div class="bigArticles">';
+                        echo '<div class="bigArticles style="display:block">';
                             echo '<h2>Articles by ' . $row['username'] . '</h2>';
                             echo '<div class="articles">';
                             //Loop through articles and display them
@@ -178,14 +182,40 @@
                                         echo "</div>";
                                         echo "</div>";
                                     echo "</div>";
-                                echo "</div>";
-                                //^end of bigArticles div
-                                
-                                
+                                echo "</div>";                                
                             }
                         }else{
                             echo '<p>No articles yet!</p>';
-                        }    
+                        }
+                        
+                        //lists hidden by default
+                        echo '<div class="lists" style="display:none">';
+                        echo '<h2>Your Lists</h2>';
+                        //Loop through lists and display them
+                        if(mysqli_num_rows($result3) > 0){
+                            $result3 = mysqli_query($conn, $sql3);
+                            mysqli_data_seek($result3, 0); // Reset the result pointer to the beginning
+                            while($row3 = mysqli_fetch_assoc($result3)){
+                                //A card for each list showing the title, description and number of items
+                                echo '<div class="card mb-3 list">';
+                                echo '<div class="row g-0">';
+                                echo '<div class="col-md-8">';
+                                echo '<div class="card-body">';
+                                echo '<h5 class="card-title title">' . $row3['listName'] . '</h5>';
+                                echo '<p class="card-text">' . $row3['description'] . '</p>';
+                                //Articles contains a list of article ids separated by commas
+                                $articles = explode(',', $row3['articles']);
+                                echo '<p class="card-text">' . count($articles) . ' items</p>';
+                                //Hidden element for id
+                                echo '<p class="card-text id" hidden>' . $row3['list_id'] . '</p>';
+                                echo '</div>';
+                                echo '</div>';
+                                echo '</div>';
+                                echo '</div>';
+                            }
+                        }else{
+                            echo '<p>No lists yet!</p>';
+                        }
                     ?>
                 </div>
             </div>
@@ -198,4 +228,41 @@
 
 </body>
 </html>
+
+<?php 
+    //Update profile
+    if(isset($_POST['editProfile'])){
+        $name = $_POST['name'];
+        $surname = $_POST['surname'];
+        $dateOfBirth = $_POST['dateOfBirth'];
+        $email = $_POST['email'];
+        $username = $_POST['username'];
+        $password = $_POST['password'];
+        $profilePicture = $_FILES['profilePicture']['name'];
+
+        //If the user has uploaded a new profile picture
+        if($profilePicture != ''){
+            $target = "images/profilePictures/" . basename($profilePicture);
+            $sql = "UPDATE users SET profilePicture = '$target' WHERE id = '$userID'";
+            mysqli_query($conn, $sql);
+            move_uploaded_file($_FILES['profilePicture']['tmp_name'], $target);
+        }
+
+        $sql = "UPDATE users SET name = '$name', surname = '$surname', dateOfBirth = '$dateOfBirth', email = '$email', username = '$username', password = '$password' WHERE id = '$userID'";
+        mysqli_query($conn, $sql);
+
+        //Update session variables
+        $_SESSION['username'] = $username;
+        
+        unset($_POST['editProfile']);
+        //echo a script form to post to profile.php to refresh the page include the userID so that the profile page refreshes with the correct user
+        echo '<form action="profile.php" method="POST" id="refresh">';
+        echo '<input type="hidden" name="userID" value="' . $userID . '">';
+        echo '</form>';
+        echo '<script type="text/javascript">';
+        echo 'document.getElementById("refresh").submit();';
+        echo '</script>';
+        
+    }
+?>
         

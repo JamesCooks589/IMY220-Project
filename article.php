@@ -52,7 +52,7 @@
                             <img src="'.$row['artPieceImage'].'" class="img-fluid" alt="Art piece Image">
                             <figcaption>'.$row['artPieceTitle'].' by ' .$row['artist'].'</figcaption>
                         </figure>
-                        <h1>'.$row['title'].'</h1>';
+                        <h1>'.$row['title']. ' by <form method="POST" action="profile.php"><input hidden type="text" name="userID" id="id" value="'.$articleCreatorId.'"><button type="submit" class="btn btn-primary" name="submit" id="submit">'.$row['author'].'</button></form></h1>';
                         $hashtags = explode(",", $row['hashtags']);
                         foreach($hashtags as $hashtag){
                             echo '<span class="badge bg-secondary">'.$hashtag.'</span>';
@@ -84,7 +84,7 @@
                                 </div>
                                 <div class="form-group">
                                     <h6>Upload image to support your review</h6>
-                                    <input type="file" class="form-control-file" name="reviewImage" id="reviewImage" accept="image/*">
+                                    <input type="file" class="form-control" name="reviewImage" id="reviewImage" accept="image/*">
                                 </div>
                                 <button type="submit" class="btn btn-primary" name="submitReview" id="submitReview">Submit</button>
                             </form>
@@ -108,7 +108,7 @@
                                             </div>
                                             <div class="review-body">';
                                                 if($row['reviewImage'] != ""){
-                                                    echo '<img src="'.$row['reviewImage'].'" alt="Review Image">';
+                                                    echo '<img src="'.$row['reviewImage'].'" alt="Review Image" id="reviewImage">';
                                                 }
                                                 echo '
                                                 <pre>'.$row['reviewText'].'</pre>
@@ -274,7 +274,10 @@
             <!-- Include Bootstrap JS -->
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
 
-            ';
+            <!-- JS -->
+            <script src="js/article.js"></script>
+        </body>
+        </html>';
 
 
     //Add review
