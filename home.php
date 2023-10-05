@@ -40,7 +40,11 @@
         <button class="btn btn-primary active" id="global">Global</button>
     </div>
     
-    <img src="images/profilePictures/placeholder.jpg" alt="Profile Picture" class="img-fluid rounded-circle" id="profile-pic">
+    <div id="profilePicture">
+      <img src="images/profilePictures/placeholder.jpg" alt="Profile Picture" class="img-fluid rounded-circle" id="profile-pic">
+      <!-- hidden input with user id -->
+      <input type="hidden" id="userID" value="<?php echo $_SESSION['id'] ?>">
+    </div>
   </nav>
   <!-- Body content -->
 
@@ -153,7 +157,11 @@
                         </select>
                     </div>
                     <!--Image upload-->
-                    <input type="file" id="artPieceImage" name="artPieceImage" accept="image/*" >
+                    <div class="mb-3">
+                      <label for="artPieceImage" class="form-label">Add an image about showing the art</label>
+                      <input class="form-control" type="file" id="artPieceImage" name="artPieceImage" accept="image/*" required>
+                    </div>
+
 
                   <div class="modal-footer">
                       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
