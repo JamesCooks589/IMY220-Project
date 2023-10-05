@@ -53,11 +53,13 @@
                             <figcaption>'.$row['artPieceTitle'].' by ' .$row['artist'].'</figcaption>
                         </figure>
                         <h1>'.$row['title']. ' by <form method="POST" action="profile.php"><input hidden type="text" name="userID" id="id" value="'.$articleCreatorId.'"><button type="submit" class="btn btn-primary" name="submit" id="submit">'.$row['author'].'</button></form></h1>';
+                        echo '<div class="hashtags">';
                         $hashtags = explode(",", $row['hashtags']);
                         foreach($hashtags as $hashtag){
-                            echo '<span class="badge bg-secondary">'.$hashtag.'</span>';
+                            echo '<span class="badge hashtag">'.$hashtag.'</span>';
                         }
                         echo '
+                        </div>
                         <div class="category">
                             <span class="badge bg-primary">'.$row['category'].'</span>
                         </div>
@@ -107,14 +109,15 @@
                                                 <h3>'.$row['username'].'</h3>
                                             </div>
                                             <div class="review-body">';
+                                                echo '<pre>'.$row['reviewText'].'</pre>';
                                                 if($row['reviewImage'] != ""){
                                                     echo '<img src="'.$row['reviewImage'].'" alt="Review Image" id="reviewImage">';
                                                 }
                                                 echo '
-                                                <pre>'.$row['reviewText'].'</pre>
+                                                
                                                 
                                             </div>
-                                            <div review-footer>
+                                            <div class="review-footer">
                                                 <h6>'.$row['date'].'</h6>
                                                 <div class="like-dislike">
                                                     <button type="button" class="btn btn-primary" id="like"><i class="lni lni-thumbs-up"></i></button>
@@ -159,8 +162,8 @@
                     echo '
                     <div class="sidebar col-md-2">
                         <div class="profile">
-                            <img src="'.$_SESSION['profilePicture'].'" alt="Profile Picture">
-                            <h3>'.$_SESSION['username'].'</h3>
+                            <img src="'.$_SESSION['profilePicture'].'" alt="Profile Picture" class="profilePicture">
+                            
                         </div>
                         <div class="lists">
                             <form method="POST" action="">
@@ -181,8 +184,8 @@
                                         <input type="text" class="form-control" name="newListDescription" id="newListDescription" placeholder="Description" maxlength="255">
                                         <button type="submit" class="btn btn-primary" name="submitNewList" id="submitNewList">Submit</button>
                                     </div>
-                                    <class="existingList">
-                                        <label for="existingList">Add article to Existing List</label>
+                                    <div class="existingList">
+                                        <h6>Add article to existing list</h6>
                                         <select class="form-control" name="existingList" id="existingList">
                                             <option value="none">Select List</option>';
                                             while($listRow = mysqli_fetch_assoc($result)){
@@ -198,18 +201,21 @@
                             //If the user is creator of the article allow them to edit and delete the article
                             //Edit modal
                             echo '
+                            <br>
+                            <br>
                             <div class="edit-delete">';
                             if(isset($_SESSION['id'])){
                                 if($_SESSION['id'] == $articleCreatorId){
                                     //Edit button to toggle edit modal and delete button in a form
                                     echo '
-                                        <br>
                                         <h6>Edit or Delete Article</h6>
-                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editArticle">Edit</button>
+                                        
                                         <form method="POST" action="">
                                             <input hidden type="text" name="id" id="id" value="'.$article_id.'">
-                                            <button type="submit" class="btn btn-primary" name="delete" id="delete">Delete</button>
-                                        </form>';
+                                            <button type="submit" class="btn" name="delete" id="delete">Delete</button>
+                                        </form>
+                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editArticle">Edit</button>
+                                        ';
                                 }
                             }
                             
