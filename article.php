@@ -64,22 +64,6 @@
                         <div class="body">
                             <pre>'.$row['body'].'</pre>
                         </div>';
-                        //If the user is creator of the article allow them to edit and delete the article
-                        //Edit modal
-
-                        echo '
-                        <div class="edit-delete">';
-                        if(isset($_SESSION['id'])){
-                            if($_SESSION['id'] == $articleCreatorId){
-                                //Edit button to toggle edit modal and delete button in a form
-                                echo '
-                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editArticle">Edit</button>
-                                    <form method="POST" action="">
-                                        <input hidden type="text" name="id" id="id" value="'.$article_id.'">
-                                        <button type="submit" class="btn btn-primary" name="delete" id="delete">Delete</button>
-                                    </form>';
-                            }
-                        }
 
                         echo '<div class="userReview">
                             <div class="like-dislike">
@@ -93,7 +77,7 @@
                                 </div>
                             </div>
                             <h2>What did you think of this article?</h2>
-                            <form method="POST" action="">
+                            <form method="POST" action="" enctype="multipart/form-data">
                                 <input hidden type="text" name="id" id="id" value="'.$article_id.'">
                                 <div class="form-group">
                                     <textarea class="form-control" name="review" id="review" cols="30" rows="10" placeholder="Write your review here" required></textarea>
@@ -169,6 +153,10 @@
                             }
                             echo '                                                 
                     </div>
+                    </div>';
+                    //If the user is logged in allow them to add the article to a list
+                    //SIDEBAR
+                    echo '
                     <div class="sidebar col-md-2">
                         <div class="profile">
                             <img src="'.$_SESSION['profilePicture'].'" alt="Profile Picture">
@@ -185,8 +173,12 @@
                                
                                 echo '
                                     <div class="newList">
-                                        <label for="newList">Create New List</label>
+                                        <h6>Create New List</h6>
+                                        <label for="newList">New List name</label>
                                         <input type="text" class="form-control" name="newList" id="newList" placeholder="New List">
+                                        <br>
+                                        <label for="newListDescription">What is the list about?</label>
+                                        <input type="text" class="form-control" name="newListDescription" id="newListDescription" placeholder="Description" maxlength="255">
                                         <button type="submit" class="btn btn-primary" name="submitNewList" id="submitNewList">Submit</button>
                                     </div>
                                     <class="existingList">
@@ -201,16 +193,37 @@
                                         <button type="submit" class="btn btn-primary" name="submitExistingList" id="submitExistingList">Submit</button>
                                     </div>
 
-                            </form>
-                        </div>';
-                        echo '
+                            </form>';
+                            
+                            //If the user is creator of the article allow them to edit and delete the article
+                            //Edit modal
+                            echo '
+                            <div class="edit-delete">';
+                            if(isset($_SESSION['id'])){
+                                if($_SESSION['id'] == $articleCreatorId){
+                                    //Edit button to toggle edit modal and delete button in a form
+                                    echo '
+                                        <br>
+                                        <h6>Edit or Delete Article</h6>
+                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editArticle">Edit</button>
+                                        <form method="POST" action="">
+                                            <input hidden type="text" name="id" id="id" value="'.$article_id.'">
+                                            <button type="submit" class="btn btn-primary" name="delete" id="delete">Delete</button>
+                                        </form>';
+                                }
+                            }
+                            
+                            echo '
+                           </div>
                         </div>
                     </div>
-                </div>
             </div>
 
             ';
             //Edit modal with form to edit article data and submit button to submit changes
+            $sql = "SELECT * FROM articles WHERE article_id = '$article_id'";
+            $result = mysqli_query($conn, $sql);
+            $row = mysqli_fetch_assoc($result);
             echo ' 
             <div class="modal fade" id="editArticle" tabindex="-1" aria-labelledby="articleModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
@@ -273,56 +286,58 @@
         //Check if file is of type image
         if(isset($_FILES['reviewImage'])){
             $target_dir = "images/reviews/";
-            $uploadFile = $_FILES['reviewImage'];
-            $checkSize = getimagesize($uploadFile["tmp_name"][0]);
+            $target_file = $target_dir . basename($_FILES['reviewImage']['name']);
             $uploadOK = 1;
-            if($checkSize !== false){
-                //Check if file is larger than 2MB
-                if($uploadFile["size"][0] > 2000000){
-                    echo "File is too large";
-                    $uploadOK = 0;
-                }
-                else{
-                    $uploadOK = 1;
-                }
+            $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+
+            $check = getimagesize($_FILES['reviewImage']['tmp_name']);
+            if($check !== false) {
+                echo "File is an image - " . $check["mime"] . ".";
+                $uploadOk = 1;
+            } else {
+                echo "<script>alert('File is not an image.')</script>";
+                $uploadOk = 0;
+            }
+
+            //Check size
+            if($_FILES['reviewImage']['size'] > 2000000){
+                echo "<script>alert('File is too large.')</script>";
+                $uploadOk = 0;
+            }
+
+            //Only allow jpg, png and jpeg
+            if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"){
+                echo "<script>alert('Only JPG, JPEG and PNG files are allowed.')</script>";
+                $uploadOk = 0;
+            }
+
+            //Check if uploadOK is set to 0 by an error
+            if($uploadOk == 0){
+                echo "<script>alert('File was not uploaded.')</script>";
             }
             else{
-                echo "File is not an image";
-                $uploadOK = 0;
-            }
-            $checkFileType = strtolower(pathinfo($uploadFile["name"][0], PATHINFO_EXTENSION));
-            if($checkFileType == "png" || $checkFileType == "jpg" || $checkFileType == "jpeg"){
-                $uploadOK = 1;
-            }
-            else{
-                echo "File is not a png, jpg or jpeg";
-                $uploadOK = 0;
-            }
-
-            //Get file extension
-            $fileExtension = pathinfo($uploadFile["name"][0], PATHINFO_EXTENSION);
-
-            //Hash filename to  create unique name
-            $hash = hash('md5', $uploadFile["name"][0]);
-            $target_file = $target_dir . $hash . "." . $fileExtension;
-            $filename = $hash . "." . $fileExtension;
-
-            //Upload Image
-            if($uploadOK == 1){
-                if(move_uploaded_file($uploadFile["tmp_name"][0], $target_file)){
+                //Hash filename + current unix time to create unique name
+                $hash = hash('md5', $_FILES['reviewImage']['name'] . time());
+                $target_file = $target_dir . $hash . "." . $imageFileType;
+                $filename = $hash . "." . $imageFileType;
+                if(move_uploaded_file($_FILES['reviewImage']['tmp_name'], $target_file)){
                     echo "File uploaded";
                 }
                 else{
                     echo "Error uploading file";
                 }
+
+                //Upload review to database in order review_id(AutoIncrement) article_id user_id reviewText	reviewImage	date(Today)	likes	dislikes
+                $sql = "INSERT INTO reviews(article_id, user_id, username, reviewText, reviewImage, date, likes, dislikes) VALUES('$article_id', '$_SESSION[id]', '$_SESSION[username]', '$review', '$target_file', '$date', 0, 0)";
+                $result = mysqli_query($conn, $sql);
+                if(!$result){
+                    echo "Error: ".mysqli_error($conn);
+                }
+
+                unset($_POST['submitReview']);
             }
 
-            //Upload review to database in order review_id(Primary key/Auto Increment)	article_id	user_id	username	reviewText	reviewImage	date	likes	dislikes
-            $sql = "INSERT INTO reviews(article_id, user_id, username, reviewText, reviewImage, date, likes, dislikes) VALUES('$article_id', '$_SESSION[id]', '$_SESSION[username]', '$review', '$target_file', '$date', 0, 0)";
-            $result = mysqli_query($conn, $sql);
-            if(!$result){
-                echo "Error: ".mysqli_error($conn);
-            }
+
         }
         else{
             //Upload review to database in order review_id(AutoIncrement) article_id user_id reviewText	reviewImage	date(Today)	likes	dislikes
@@ -332,6 +347,7 @@
                 echo "Error: ".mysqli_error($conn);
             }
         }
+        unset($_POST['submitReview']);
     }
 
     //Delete review
@@ -345,7 +361,7 @@
             echo "Error: ".mysqli_error($conn);
         }
 
-
+        unset($_POST['deleteReview']);
         
     }
 
@@ -364,6 +380,7 @@
                 window.location.href = "home.php";
             </script>
         ';
+        unset($_POST['delete']);
     }
 
     //Edit article
@@ -439,17 +456,26 @@
                 echo "Error: ".mysqli_error($conn);
             }
         }
+        unset($_POST['submitEdit']);
     }
 
     //Create new list
     if(isset($_POST['submitNewList'])){
         $listName = $_POST['newList'];
         //Insert new list into database
-        $sql = "INSERT INTO lists(user_id, listName) VALUES('$_SESSION[id]', '$listName')";
+        $sql = "INSERT INTO lists(user_id, listName, description, articles) VALUES('$_SESSION[id]', '$listName', '$_POST[newListDescription]','')";
         $result = mysqli_query($conn, $sql);
         if(!$result){
             echo "Error: ".mysqli_error($conn);
         }
+        else{
+            echo '
+                <script>
+                    alert("List created");
+                </script>
+            ';
+        }
+        unset($_POST['submitNewList']);
     }
 
     //Add article to existing list
@@ -478,5 +504,6 @@
                 </script>
             ';
         }
+        unset($_POST['submitExistingList']);
     }
 ?>

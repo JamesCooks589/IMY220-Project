@@ -35,7 +35,7 @@
   <img src="images/starry_night.png" alt="Banner" class="img-fluid">
   <nav>
   <div id="feeds">
-      
+
         <button class="btn btn-primary inactive" id="local">Local</button>
         <button class="btn btn-primary active" id="global">Global</button>
     </div>
@@ -110,7 +110,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form method="POST" action="">
+                <form method="POST" action="" enctype="multipart/form-data">
                     <div class="mb-3">
                         <label for="articleTitle" class="form-label">Title</label>
                         <input type="text" class="form-control" id="articleTitle" name="articleTitle" required>
@@ -138,7 +138,6 @@
                     <div class="mb-3">
                         <label for="categorySelect" class="form-label">Category</label>
                         <select class="form-select" id="categorySelect" name="categorySelect" required>
-                          <!--Ordered alphabetically-->
                         <option value="" disabled selected>Select a category</option>
                           <option value="visual_art">Visual Art</option>
                           <option value="sculpture">Sculpture</option>
@@ -153,6 +152,8 @@
                           <option value="digital_art">Digital Art</option>
                         </select>
                     </div>
+                    <!--Image upload-->
+                    <input type="file" id="artPieceImage" name="artPieceImage" accept="image/*" >
 
                   <div class="modal-footer">
                       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -166,10 +167,6 @@
 
   <?php
 
-    if(isset($_POST["createArticle"])){
-      echo "<script>console.log('createArticle')</script>";
-    }
-
     //Add article function
       if(isset($_POST["createArticle"])){
         $userID = $_SESSION["id"];
@@ -179,11 +176,60 @@
           $body = $_POST["articleBody"];
           $artist = $_POST["artistName"];
           $artPieceTitle = $_POST["artPieceTitle"];
-          $artPieceImage = "images/gallery/placeholder.png";
           $hashtags = $_POST["hashtags"];
           $category = $_POST["categorySelect"];
           //Date is current date expressed as YYYY-MM-DD
           $date = date("Y-m-d");
+          var_dump($_FILES);
+          //Image upload
+          if(isset($_FILES["artPieceImage"])){
+            $target_dir = "images/gallery/";
+            $target_file = $target_dir . basename($_FILES["artPieceImage"]["name"]);
+            $uploadOk = 1;
+            $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
+            // Check if image file is a actual image or fake image
+
+            $check = getimagesize($_FILES["artPieceImage"]["tmp_name"]);
+            if($check !== false) {
+              echo "File is an image - " . $check["mime"] . ".";
+              $uploadOk = 1;
+            } else {
+              echo "<script>alert('File is not an image.')</script>";
+              $uploadOk = 0;
+            }
+
+            // Check file size
+            if ($_FILES["artPieceImage"]["size"] > 500000) {
+              echo "<script>alert('Sorry, your file is too large.')</script>";
+              $uploadOk = 0;
+            }
+
+            // Allow certain file formats
+            if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg") {
+              echo "<script>alert('Sorry, only JPG, JPEG, PNG & GIF files are allowed.')</script>";
+              $uploadOk = 0;
+            }
+
+            // Check if $uploadOk is set to 0 by an error
+            if ($uploadOk == 0) {
+              echo "<script>alert('Sorry, your file was not uploaded.')</script>";
+            // if everything is ok, try to upload file
+            } else {
+              //Hash file name
+              $hash = hash('md5', $_FILES["artPieceImage"]["name"]);
+              $target_file = $target_dir . $hash . "." . $imageFileType;
+              $filename = $hash . "." . $imageFileType;
+              if (move_uploaded_file($_FILES["artPieceImage"]["tmp_name"], $target_file)) {
+                echo "<script>alert('The file ". htmlspecialchars( basename( $_FILES["artPieceImage"]["name"])). " has been uploaded.')</script>";
+                $artPieceImage = $target_file;
+              } else {
+                echo "<script>alert('Sorry, there was an error uploading your file.')</script>";
+              }
+            }
+          }
+          else{
+            echo "<script>alert('Please upload an image')</script>";
+          }
 
           $query = "INSERT INTO `articles`(`article_id`, `user_id`, `title`, `author`, `summary`, `body`, `artist`, `artPieceTitle`, `artPieceImage`, `hashtags`, `category`, `date`) VALUES (NULL, '$userID', '$title', '$author', '$summary', '$body', '$artist', '$artPieceTitle', '$artPieceImage', '$hashtags', '$category', '$date')";
           $mysqli->query($query);
@@ -193,10 +239,10 @@
             echo "<script>alert(".$mysqli->error.")</script>";
           }
           
+          //Stop page from resubmitting form
+          echo "<script>window.location.href = 'home.php'</script>";
+          unset($_POST["createArticle"]);
 
-          //If successful, alert success then refresh page
-          echo "<script>alert('Article successfully created!')</script>";
-          echo "<script>window.location.href='home.php'</script>";
 
         }
 
