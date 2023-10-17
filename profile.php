@@ -186,10 +186,24 @@
                             }
                         }else{
                             echo '<p>No articles yet!</p>';
+                            echo '</div>';
+                            echo '</div>';
                         }
                         
                         //lists hidden by default
                         echo '<div class="lists" style="display:none">';
+                        
+                        //Create new list button
+                        echo '<form action="" method="POST">';
+                        echo '<h2>Create a new list</h2>';
+                        echo '<input type="hidden" name="userID" value="' . $userID . '">';
+                        echo '<label for="listName">List Name</label>';
+                        echo '<input type="text" class="form-control" id="listName" name="listName">';
+                        echo '<label for="description">Description</label>';
+                        echo '<input type="text" class="form-control" id="description" name="description">';
+                        echo '<button type="submit" class="btn btn-primary" name="createList">Create List</button>';
+                        echo '</form>';
+
                         echo '<h2>Your Lists</h2>';
                         //Loop through lists and display them
                         if(mysqli_num_rows($result3) > 0){
@@ -264,5 +278,41 @@
         echo '</script>';
         
     }
+
+        //Create new list
+        if(isset($_POST['createList'])){
+            //Create a new list with the userID, listName and description
+            //sanitize inputs
+            $listName = $_POST['listName'];
+            //If input is empty, show error message
+            if($listName == ''){
+                echo '<script type="text/javascript">';
+                echo 'alert("Please enter a list name");';
+                echo '</script>';
+                exit();
+            }
+            $description = $_POST['description'];
+            if($description == ''){
+                echo '<script type="text/javascript">';
+                echo 'alert("Please enter a description");';
+                echo '</script>';
+                exit();
+            }
+            $userID = $_POST['userID'];
+
+            $listName = mysqli_real_escape_string($conn, $listName);
+            $description = mysqli_real_escape_string($conn, $description);
+            $userID = mysqli_real_escape_string($conn, $userID);
+            $sql = "INSERT INTO lists (user_id, listName, description) VALUES ('$userID', '$listName', '$description')";
+            mysqli_query($conn, $sql);
+            unset($_POST['createList']);
+            //echo a script form to post to profile.php to refresh the page include the userID so that the profile page refreshes with the correct user
+            echo '<form action="profile.php" method="POST" id="refresh">';
+            echo '<input type="hidden" name="userID" value="' . $userID . '">';
+            echo '</form>';
+            echo '<script type="text/javascript">';
+            echo 'document.getElementById("refresh").submit();';
+            echo '</script>';
+        }
 ?>
         

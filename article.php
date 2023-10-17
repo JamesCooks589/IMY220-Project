@@ -175,15 +175,6 @@
 
                                
                                 echo '
-                                    <div class="newList">
-                                        <h6>Create New List</h6>
-                                        <label for="newList">New List name</label>
-                                        <input type="text" class="form-control" name="newList" id="newList" placeholder="New List">
-                                        <br>
-                                        <label for="newListDescription">What is the list about?</label>
-                                        <input type="text" class="form-control" name="newListDescription" id="newListDescription" placeholder="Description" maxlength="255">
-                                        <button type="submit" class="btn btn-primary" name="submitNewList" id="submitNewList">Submit</button>
-                                    </div>
                                     <div class="existingList">
                                         <h6>Add article to existing list</h6>
                                         <select class="form-control" name="existingList" id="existingList">
@@ -289,6 +280,9 @@
     //Add review
     if(isset($_POST['submitReview'])){
         $review = $_POST['review'];
+        if($review == ""){
+            echo "<script>alert('Please write a review.')</script>";
+        }
         $date = date("Y-m-d");
         $intArticleId = (int)$article_id;
         //If there is an image upload the  name of the image otherwise set it to empty
@@ -402,6 +396,12 @@
         $artist = $_POST['artist'];
         $date = date("Y-m-d");
         $intArticleId = (int)$article_id;
+
+        //Check if all fields are filled
+        if($title == "" || $hashtags == "" || $category == "" || $body == "" || $artPieceTitle == "" || $artist == ""){
+            echo "<script>alert('Please fill in all fields.')</script>";
+        }
+
         //If there is an image upload the  name of the image otherwise set it to empty
         //Check if file is of type image
         if(isset($_FILES['artPieceImage'])){
@@ -466,25 +466,6 @@
             }
         }
         unset($_POST['submitEdit']);
-    }
-
-    //Create new list
-    if(isset($_POST['submitNewList'])){
-        $listName = $_POST['newList'];
-        //Insert new list into database
-        $sql = "INSERT INTO lists(user_id, listName, description, articles) VALUES('$_SESSION[id]', '$listName', '$_POST[newListDescription]','')";
-        $result = mysqli_query($conn, $sql);
-        if(!$result){
-            echo "Error: ".mysqli_error($conn);
-        }
-        else{
-            echo '
-                <script>
-                    alert("List created");
-                </script>
-            ';
-        }
-        unset($_POST['submitNewList']);
     }
 
     //Add article to existing list

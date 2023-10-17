@@ -234,8 +234,6 @@
             $email = mysqli_real_escape_string($mysqli, $email);
             $pass = mysqli_real_escape_string($mysqli, $pass);
 
-            $pass = md5($pass);
-
 
             $query = "SELECT * FROM users WHERE email = '$email' AND password = '$pass'";
 
@@ -292,9 +290,6 @@
                     echo "<script>alert('Email already exists')</script>";
                 }
                 else{
-
-                    //Hash password
-                    $pass = md5($pass);
 
                     //Insert into database
                     $query = "INSERT INTO `users`(`name`, `surname`, `email`, `username`, `password`, `profilePicture`, `prefrence`, `dateOfBirth`) VALUES ('$firstName', '$lastName', '$email', '$username', '$pass', 'images/profilePictures/default.png', 'dark', '$dob')";

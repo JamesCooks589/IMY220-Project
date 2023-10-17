@@ -188,6 +188,12 @@
           $category = $_POST["categorySelect"];
           //Date is current date expressed as YYYY-MM-DD
           $date = date("Y-m-d");
+
+          //Check all fields are filled
+          if($title == "" || $summary == "" || $body == "" || $artist == "" || $artPieceTitle == "" || $hashtags == "" || $category == ""){
+            echo "<script>alert('Please fill in all fields')</script>";
+            return;
+          }
           var_dump($_FILES);
           //Image upload
           if(isset($_FILES["artPieceImage"])){
@@ -238,6 +244,17 @@
           else{
             echo "<script>alert('Please upload an image')</script>";
           }
+
+          //Error checking and sanitization
+          $title = $mysqli->real_escape_string($title);
+          $author = $mysqli->real_escape_string($author);
+          $summary = $mysqli->real_escape_string($summary);
+          $body = $mysqli->real_escape_string($body);
+          $artist = $mysqli->real_escape_string($artist);
+          $artPieceTitle = $mysqli->real_escape_string($artPieceTitle);
+          $hashtags = $mysqli->real_escape_string($hashtags);
+          $category = $mysqli->real_escape_string($category);
+          $date = $mysqli->real_escape_string($date);
 
           $query = "INSERT INTO `articles`(`article_id`, `user_id`, `title`, `author`, `summary`, `body`, `artist`, `artPieceTitle`, `artPieceImage`, `hashtags`, `category`, `date`) VALUES (NULL, '$userID', '$title', '$author', '$summary', '$body', '$artist', '$artPieceTitle', '$artPieceImage', '$hashtags', '$category', '$date')";
           $mysqli->query($query);

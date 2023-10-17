@@ -198,7 +198,7 @@ pre {
     
 }
 
-.newList h6, .existingList h6, .edit-delete h6{
+.existingList h6, .edit-delete h6{
     font-family: 'Exo 2', sans-serif;
     font-size: 2em;
     background: rgb(124,242,239);
@@ -208,12 +208,12 @@ pre {
     text-align: center;
 }
 
-.newList, .existingList{
+.existingList{
     width: 100%;
     margin: 10px 0;
 }
 
-.newList button, .existingList button{
+.existingList button{
     float: right;
 }
 
