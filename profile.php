@@ -256,6 +256,17 @@
             exit();
         }
 
+        //Check if email already exists
+        $sql = "SELECT * FROM users WHERE email = '$email'";
+        $result = mysqli_query($mysqli, $sql);
+        $resultCheck = mysqli_num_rows($result);
+        if($resultCheck > 0){
+            echo '<script type="text/javascript">';
+            echo 'alert("Email already exists");';
+            echo '</script>';
+            exit();
+        }
+
         //Sanitize inputs
         $name = mysqli_real_escape_string($mysqli, $name);
         $surname = mysqli_real_escape_string($mysqli, $surname);
