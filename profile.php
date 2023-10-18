@@ -10,17 +10,20 @@
 
 
     //All sql queries for sections on profile page
+    //User info
     $sql = "SELECT * FROM users WHERE id = '$userID'";
     $result = mysqli_query($mysqli, $sql);
     $row = mysqli_fetch_assoc($result);
 
+    //Articles
     $sql2 = "SELECT * FROM articles WHERE user_id = '$userID' ORDER BY date DESC";
     $result2 = mysqli_query($mysqli, $sql2);
 
-
+    //Lists
     $sql3 = "SELECT * FROM lists WHERE user_id = '$userID'";
     $result3 = mysqli_query($mysqli, $sql3);
     $row3 = mysqli_fetch_assoc($result3);
+    
 ?>
 
 
@@ -129,18 +132,21 @@
                 <!--Only show lists if the userID and session id are the same-->
                 <div class="col-md-8 articleAndList">
                 <?php 
+                    $friends = $row['friends'];
+                    $friendsArray = explode(',', $friends);
                     // If the user is the owner of the profile, display toggle buttons between lists and articles
-                    if ($userID == $_SESSION['id']) {
+                    if ($userID == $_SESSION['id'] || in_array($_SESSION['id'], $friendsArray)) {
                         echo '<div class="toggle">';
                         echo '<button class="btn btn-primary active" id="articles">Articles</button>';
                         echo '<button class="btn btn-primary inactive" id="lists">Lists</button>';
+                        echo '<button class="btn btn-primary inactive" id="friends">Friends</button>';
                         echo '</div>';
                     }
                 ?>
 
                 <div class="bigArticles" style="display:block">
-                    <h2>Articles by <?php echo $row['username']; ?></h2>
                     <div class="articles">
+                     <h2>Articles by <?php echo $row['username']; ?></h2>
                         <?php
                         // Loop through articles and display them
                         if (mysqli_num_rows($result2) > 0) {
@@ -186,18 +192,25 @@
 
                 <div class="lists" style="display:none">
                     <?php
-                    // Create a new list form
-                    echo '<form action="" method="POST">';
-                    echo '<h2>Create a new list</h2>';
-                    echo '<input type="hidden" name="userID" value="' . $userID . '">';
-                    echo '<label for="listName">List Name</label>';
-                    echo '<input type="text" class="form-control" id="listName" name="listName">';
-                    echo '<label for="description">Description</label>';
-                    echo '<input type="text" class="form-control" id="description" name="description">';
-                    echo '<button type="submit" class="btn btn-primary" name="createList">Create List</button>';
-                    echo '</form>';
-
-                    echo '<h2>Your Lists</h2>';
+                    //Only display create list form if the user is the owner of the profile
+                    if ($userID == $_SESSION['id']) {
+                            // Create a new list form
+                        echo '<form action="" method="POST">';
+                        echo '<h2>Create a new list</h2>';
+                        echo '<input type="hidden" name="userID" value="' . $userID . '">';
+                        echo '<label for="listName">List Name</label>';
+                        echo '<input type="text" class="form-control" id="listName" name="listName">';
+                        echo '<label for="description">Description</label>';
+                        echo '<input type="text" class="form-control" id="description" name="description">';
+                        echo '<button type="submit" class="btn btn-primary" name="createList">Create List</button>';
+                        echo '</form>';
+                    }
+                    if ($userID == $_SESSION['id']) {
+                        echo '<h2>Your Lists</h2>';
+                    } else {
+                        echo '<h2>' . $row['username'] . '\'s Lists</h2>';
+                    }
+                    
                     // Loop through lists and display them
                     if (mysqli_num_rows($result3) > 0) {
                         $result3 = mysqli_query($mysqli, $sql3);
@@ -224,6 +237,39 @@
                     }
                     ?>
                 </div>
+
+                <!--Friends-->
+                <div class="friends" style="display: none">
+                <h2>Friends</h2>
+                <div class="friends-list">
+                    <?php
+                    // Display a list of friends here
+                    foreach ($friendsArray as $friendID) {
+                        $friendID = mysqli_real_escape_string($mysqli, $friendID);
+
+                        // Query to retrieve the friend's information
+                        $friendInfoSql = "SELECT * FROM users WHERE id = '$friendID'";
+                        $friendInfoResult = mysqli_query($mysqli, $friendInfoSql);
+                        $friendInfo = mysqli_fetch_assoc($friendInfoResult);
+
+                        // Display the friend's information in a card
+                        echo '<div class="friend-card card mb-4">';
+                        echo '<img src="' . $friendInfo['profilePicture'] . '" class="card-img-top" alt="Friend Profile Picture">';
+                        echo '<div class="card-body">';
+                        echo '<h5 class="card-title">' . $friendInfo['username'] . '</h5>';
+                        echo '<p class="card-text">Name: ' . $friendInfo['name'] . ' ' . $friendInfo['surname'] . '</p>';
+                        echo '<p class="card-text">Email: ' . $friendInfo['email'] . '</p>';
+                        echo '<form action="profile.php" method="POST" style="display: inline;">';
+                        echo '<input type="hidden" name="userID" value="' . $friendInfo['id'] . '">';
+                        echo '<button type="submit" class="btn btn-primary" name="visitProfile">Visit Profile</button>';
+                        echo '</form>';
+                        echo '</div>';
+                        echo '</div>';
+                    }
+                    ?>
+    </div>
+</div>
+
             </div>
 
             </div>
@@ -256,11 +302,11 @@
             exit();
         }
 
-        //Check if email already exists
+        //Check if email already exists and does not belong to the user
         $sql = "SELECT * FROM users WHERE email = '$email'";
         $result = mysqli_query($mysqli, $sql);
-        $resultCheck = mysqli_num_rows($result);
-        if($resultCheck > 0){
+        $row = mysqli_fetch_assoc($result);
+        if(mysqli_num_rows($result) > 0 && $row['id'] != $userID){
             echo '<script type="text/javascript">';
             echo 'alert("Email already exists");';
             echo '</script>';

@@ -88,6 +88,11 @@ body{
     box-shadow: 0 0 10px 0 rgba(0,0,0,0.5);
 }
 
+#socialProof img:hover{
+    transform: scale(1.1);
+    transition: all 0.5s ease-in-out;
+}
+
 #features {
     display: flex;
     flex-direction: column;
@@ -95,6 +100,7 @@ body{
     margin-bottom: 5%;
     
 }
+
 
 
 #CTA {
@@ -148,3 +154,16 @@ body{
   .modal-body, .modal-header, .form-control {
     background-color: #555555;
   }
+
+  .feature {
+    transform : translateX(-100%);
+    opacity: 0;
+    transition: all 0.5s ease-in-out;
+    transition-delay: 0s;
+  }
+
+  .slide-in {
+    transform: translateX(0);
+    transition: transform 0.5s ease, opacity 0.5s ease;
+  }
+  
