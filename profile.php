@@ -16,7 +16,6 @@
 
     $sql2 = "SELECT * FROM articles WHERE user_id = '$userID' ORDER BY date DESC";
     $result2 = mysqli_query($mysqli, $sql2);
-    $row2 = mysqli_fetch_assoc($result2);
 
 
     $sql3 = "SELECT * FROM lists WHERE user_id = '$userID'";
@@ -76,64 +75,53 @@
                 <div class="col-md-4">
                     <h2>Profile Info</h2>
                     <div class="profileInfo">
-                        <?php 
-                            echo '<img src="' . $row['profilePicture'] . '" alt="Profile Picture" class="img-fluid">';
-                            echo '<p>Username: ' . $row['username'] . '</p>';
-                            echo '<p>Email: ' . $row['email'] . '</p>';
-                            //If the userID and session id are the same, show edit profile button and other personal info
-                            if($userID == $_SESSION['id']){
-                                echo '<p>First Name: ' . $row['name'] . '</p>';
-                                echo '<p>Last Name: ' . $row['surname'] . '</p>';
-                                echo '<p>Date of Birth: ' . $row['dateOfBirth'] . '</p>';
-                                
-                                //toggle edit profile modal
-                                echo '<button class="btn btn-primary" id="editProfile" data-bs-toggle="modal" data-bs-target="#editProfileModal">Edit Profile</button>';
-                                echo '<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">';
-                                echo '<div class="modal-dialog modal-dialog-centered">';
-                                echo '<div class="modal-content">';
-                                echo '<div class="modal-header">';
-                                echo '<h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>';
-                                echo '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>';
-                                echo '</div>';
-                                echo '<div class="modal-body">';
-                                echo '<form action="" method="POST" enctype="multipart/form-data">';
-                                echo '<input type="hidden" name="userID" value="' . $userID . '">'; //hidden input for userID
-                                echo '<div class="mb-3">';
-                                echo '<label for="profilePicture" class="form-label">Profile Picture</label>';
-                                echo '<input type="file" class="form-control" id="profilePicture" name="profilePicture">';
-                                echo '</div>';
-                                echo '<div class="mb-3">';
-                                echo '<label for="name" class="form-label">First Name</label>';
-                                echo '<input type="text" class="form-control" id="name" name="name" value="' . $row['name'] . '">';
-                                echo '</div>';
-                                echo '<div class="mb-3">';
-                                echo '<label for="surname" class="form-label">Last Name</label>';
-                                echo '<input type="text" class="form-control" id="surname" name="surname" value="' . $row['surname'] . '">';
-                                echo '</div>';
-                                echo '<div class="mb-3">';
-                                echo '<label for="dateOfBirth" class="form-label">Date of Birth</label>';
-                                echo '<input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth" value="' . $row['dateOfBirth'] . '">';
-                                echo '</div>';
-                                echo '<div class="mb-3">';
-                                echo '<label for="email" class="form-label">Email</label>';
-                                echo '<input type="email" class="form-control" id="email" name="email" value="' . $row['email'] . '">';
-                                echo '</div>';
-                                echo '<div class="mb-3">';
-                                echo '<label for="username" class="form-label">Username</label>';
-                                echo '<input type="text" class="form-control" id="username" name="username" value="' . $row['username'] . '">';
-                                echo '</div>';
-                                echo '<div class="mb-3">';
-                                echo '<label for="password" class="form-label">Password</label>';
-                                echo '<input type="password" class="form-control" id="password" name="password" value="' . $row['password'] . '">';
-                                echo '</div>';
-                                echo '</div>';
-                                echo '<button type="submit" class="btn btn-primary" name="editProfile">Submit</button>';
-                                echo '</form>';
-                                echo '</div>';
-                                echo '</div>';
-                                echo '</div>';
+                        <?php
+                        echo '<img src="' . $row['profilePicture'] . '" alt="Profile Picture" class="img-fluid">';
+                        echo '<p>Username: ' . $row['username'] . '</p>';
+                        echo '<p>Email: ' . $row['email'] . '</p>';
 
+                        if ($userID == $_SESSION['id']) {
+                            echo '<p>First Name: ' . $row['name'] . '</p>';
+                            echo '<p>Last Name: ' . $row['surname'] . '</p>';
+                            echo '<p>Date of Birth: ' . $row['dateOfBirth'] . '</p>';
+                            echo '<button class="btn btn-primary" id="editProfile" data-bs-toggle="modal" data-bs-target="#editProfileModal">Edit Profile</button>';
+                            
+                            // Edit Profile Modal
+                            echo '<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">';
+                            echo '<div class="modal-dialog modal-dialog-centered">';
+                            echo '<div class="modal-content">';
+                            echo '<div class="modal-header">';
+                            echo '<h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>';
+                            echo '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>';
+                            echo '</div>';
+                            echo '<div class="modal-body">';
+                            echo '<form action="" method="POST" enctype="multipart/form-data">';
+                            echo '<input type="hidden" name="userID" value="' . $userID . '">'; //hidden input for userID';
+                            
+                            // Function to create form input field with label
+                            function createFormInput($id, $label, $type, $name, $value) {
+                                echo '<div class="mb-3">';
+                                echo '<label for="' . $id . '" class="form-label">' . $label . '</label>';
+                                echo '<input type="' . $type . '" class="form-control" id="' . $id . '" name="' . $name . '" value="' . $value . '">';
+                                echo '</div>';
                             }
+
+                            // Create form inputs with labels
+                            createFormInput('profilePicture', 'Profile Picture', 'file', 'profilePicture', '');
+                            createFormInput('name', 'First Name', 'text', 'name', $row['name']);
+                            createFormInput('surname', 'Last Name', 'text', 'surname', $row['surname']);
+                            createFormInput('dateOfBirth', 'Date of Birth', 'date', 'dateOfBirth', $row['dateOfBirth']);
+                            createFormInput('email', 'Email', 'email', 'email', $row['email']);
+                            createFormInput('username', 'Username', 'text', 'username', $row['username']);
+                            createFormInput('password', 'Password', 'password', 'password', $row['password']);
+
+                            echo '<button type="submit" class="btn btn-primary" name="editProfile">Submit</button>';
+                            echo '</form>';
+                            echo '</div>';
+                            echo '</div>';
+                            echo '</div>';
+                            echo '</div>';
+                        }
                         ?>
                     </div>
                 </div>
@@ -259,6 +247,23 @@
         $username = $_POST['username'];
         $password = $_POST['password'];
         $profilePicture = $_FILES['profilePicture']['name'];
+
+        //Check if all fields are filled in
+        if($name == '' || $surname == '' || $dateOfBirth == '' || $email == '' || $username == '' || $password == ''){
+            echo '<script type="text/javascript">';
+            echo 'alert("Please fill in all fields");';
+            echo '</script>';
+            exit();
+        }
+
+        //Sanitize inputs
+        $name = mysqli_real_escape_string($mysqli, $name);
+        $surname = mysqli_real_escape_string($mysqli, $surname);
+        $dateOfBirth = mysqli_real_escape_string($mysqli, $dateOfBirth);
+        $email = mysqli_real_escape_string($mysqli, $email);
+        $username = mysqli_real_escape_string($mysqli, $username);
+        $password = mysqli_real_escape_string($mysqli, $password);
+        
 
         //If the user has uploaded a new profile picture
         if($profilePicture != ''){

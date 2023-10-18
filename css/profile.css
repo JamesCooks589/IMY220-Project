@@ -152,3 +152,7 @@ span {
     text-align: center;
 }
 
+.modal-header, .modal-body{
+    background-color :#2f424f;
+}
+
