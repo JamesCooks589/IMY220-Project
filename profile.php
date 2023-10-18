@@ -4,25 +4,26 @@
         header('location:login.php');
     }
 
-    $conn = mysqli_connect('localhost', 'root', '', 'wholeartedly');
-    if(!$conn){
-        die("Error connecting to database: " . mysqli_connect_error());
-    }
+    include 'db_connection.php';
 
     $userID = $_POST['userID'];
+
+
     //All sql queries for sections on profile page
     $sql = "SELECT * FROM users WHERE id = '$userID'";
-    $result = mysqli_query($conn, $sql);
+    $result = mysqli_query($mysqli, $sql);
     $row = mysqli_fetch_assoc($result);
 
-    $sql2 = "SELECT * FROM articles WHERE user_id = '$userID' ORDER BY 'date' DESC";
-    $result2 = mysqli_query($conn, $sql2);
+    $sql2 = "SELECT * FROM articles WHERE user_id = '$userID' ORDER BY date DESC";
+    $result2 = mysqli_query($mysqli, $sql2);
     $row2 = mysqli_fetch_assoc($result2);
 
+
     $sql3 = "SELECT * FROM lists WHERE user_id = '$userID'";
-    $result3 = mysqli_query($conn, $sql3);
+    $result3 = mysqli_query($mysqli, $sql3);
     $row3 = mysqli_fetch_assoc($result3);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -139,99 +140,104 @@
                 <!--Right column for articles and lists-->
                 <!--Only show lists if the userID and session id are the same-->
                 <div class="col-md-8 articleAndList">
-                    <?php 
-                        //If the user is owner of profile display toggle button between lists and articles
-                        if($userID == $_SESSION['id']){
-                            echo '<div class="toggle">';
-                            echo '<button class="btn btn-primary active" id="articles">Articles</button>';
-                            echo '<button class="btn btn-primary inactive" id="lists">Lists</button>';
-                            echo '</div>';
-                        }
-                        echo '<div class="bigArticles style="display:block">';
-                            echo '<h2>Articles by ' . $row['username'] . '</h2>';
-                            echo '<div class="articles">';
-                            //Loop through articles and display them
-                            if(mysqli_num_rows($result2) > 0){
-                                while($row2 = mysqli_fetch_assoc($result2)){
-                                    //Explode and all caps hashtags
-                                    $hashtags = explode(",", $row2["hashtags"]);
-                                    $hashtags = array_map('strtoupper', $hashtags);
-                                    echo "<div class='card mb-3 article'>";
-                                        echo "<div class='row g-0'>";
-                                        echo "<div class='col-md-4'>";
-                                        echo "<img src='".$row2["artPieceImage"]."' alt='No Image' class='img-fluid'>";
-                                        echo "</div>";
-                                        echo "<div class='col-md-8'>";
-                                        echo "<div class='card-body'>";
-                                        echo "<div class='category'>";
-                                        echo "<span class='badge bg-primary'>".$row2["category"]."</span>";
-                                        echo "</div>";
-                                        echo "<h5 class='card-title title'>".$row2["title"]."</h5>";
-                                        echo "<h6 class='card-subtitle mb-2 '>".$row2["author"]."</h6>";
-                                        echo "<h6 class='card-subtitle mb-2 '>".$row2["date"]."</h6>";
-                                        //Hidden element for id
-                                        echo "<p class='card-text id' hidden>".$row2["article_id"]."</p>";
-                                        
-                                        echo "<p class='card-text'>".$row2["summary"]."</p>";
-                                        echo "<div class='hashtags'>";
-                                        foreach($hashtags as $hashtag){
-                                        echo "<span class='badge hashtag'>".$hashtag."</span>";
-                                        }
-                                        echo "</div>";
-                                        echo "</div>";
-                                        echo "</div>";
-                                        echo "</div>";
-                                    echo "</div>";
-                                echo "</div>";                                
-                            }
-                        }else{
-                            echo '<p>No articles yet!</p>';
-                            echo '</div>';
-                            echo '</div>';
-                        }
-                        
-                        //lists hidden by default
-                        echo '<div class="lists" style="display:none">';
-                        
-                        //Create new list button
-                        echo '<form action="" method="POST">';
-                        echo '<h2>Create a new list</h2>';
-                        echo '<input type="hidden" name="userID" value="' . $userID . '">';
-                        echo '<label for="listName">List Name</label>';
-                        echo '<input type="text" class="form-control" id="listName" name="listName">';
-                        echo '<label for="description">Description</label>';
-                        echo '<input type="text" class="form-control" id="description" name="description">';
-                        echo '<button type="submit" class="btn btn-primary" name="createList">Create List</button>';
-                        echo '</form>';
+                <?php 
+                    // If the user is the owner of the profile, display toggle buttons between lists and articles
+                    if ($userID == $_SESSION['id']) {
+                        echo '<div class="toggle">';
+                        echo '<button class="btn btn-primary active" id="articles">Articles</button>';
+                        echo '<button class="btn btn-primary inactive" id="lists">Lists</button>';
+                        echo '</div>';
+                    }
+                ?>
 
-                        echo '<h2>Your Lists</h2>';
-                        //Loop through lists and display them
-                        if(mysqli_num_rows($result3) > 0){
-                            $result3 = mysqli_query($conn, $sql3);
-                            mysqli_data_seek($result3, 0); // Reset the result pointer to the beginning
-                            while($row3 = mysqli_fetch_assoc($result3)){
-                                //A card for each list showing the title, description and number of items
-                                echo '<div class="card mb-3 list">';
-                                echo '<div class="row g-0">';
-                                echo '<div class="col-md-8">';
-                                echo '<div class="card-body">';
-                                echo '<h5 class="card-title title">' . $row3['listName'] . '</h5>';
-                                echo '<p class="card-text">' . $row3['description'] . '</p>';
-                                //Articles contains a list of article ids separated by commas
-                                $articles = explode(',', $row3['articles']);
-                                echo '<p class="card-text">' . count($articles) . ' items</p>';
-                                //Hidden element for id
-                                echo '<p class="card-text id" hidden>' . $row3['list_id'] . '</p>';
-                                echo '</div>';
-                                echo '</div>';
-                                echo '</div>';
-                                echo '</div>';
+                <div class="bigArticles" style="display:block">
+                    <h2>Articles by <?php echo $row['username']; ?></h2>
+                    <div class="articles">
+                        <?php
+                        // Loop through articles and display them
+                        if (mysqli_num_rows($result2) > 0) {
+                            while ($row2 = mysqli_fetch_assoc($result2)) {
+                                // Explode and convert hashtags to uppercase
+                                $hashtags = explode(",", $row2["hashtags"]);
+                                $hashtags = array_map('strtoupper', $hashtags);
+                        ?>
+                        <div class='card mb-3 article'>
+                            <div class='row g-0'>
+                                <div class='col-md-4'>
+                                    <img src='<?php echo $row2["artPieceImage"]; ?>' alt='No Image' class='img-fluid'>
+                                </div>
+                                <div class='col-md-8'>
+                                    <div class='card-body'>
+                                        <div class='category'>
+                                            <span class='badge bg-primary'><?php echo $row2["category"]; ?></span>
+                                        </div>
+                                        <h5 class='card-title title'><?php echo $row2["title"]; ?></h5>
+                                        <h6 class='card-subtitle mb-2 '><?php echo $row2["author"]; ?></h6>
+                                        <h6 class='card-subtitle mb-2 '><?php echo $row2["date"]; ?></h6>
+                                        <p class='card-text id' hidden><?php echo $row2["article_id"]; ?></p>
+                                        <p class='card-text'><?php echo $row2["summary"]; ?></p>
+                                        <div class='hashtags'>
+                                            <?php
+                                            foreach ($hashtags as $hashtag) {
+                                                echo "<span class='badge hashtag'>$hashtag</span>";
+                                            }
+                                            ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <?php
                             }
-                        }else{
-                            echo '<p>No lists yet!</p>';
+                        } else {
+                            echo '<p>No articles yet!</p>';
                         }
+                        ?>
+                    </div>
+                </div>
+
+                <div class="lists" style="display:none">
+                    <?php
+                    // Create a new list form
+                    echo '<form action="" method="POST">';
+                    echo '<h2>Create a new list</h2>';
+                    echo '<input type="hidden" name="userID" value="' . $userID . '">';
+                    echo '<label for="listName">List Name</label>';
+                    echo '<input type="text" class="form-control" id="listName" name="listName">';
+                    echo '<label for="description">Description</label>';
+                    echo '<input type="text" class="form-control" id="description" name="description">';
+                    echo '<button type="submit" class="btn btn-primary" name="createList">Create List</button>';
+                    echo '</form>';
+
+                    echo '<h2>Your Lists</h2>';
+                    // Loop through lists and display them
+                    if (mysqli_num_rows($result3) > 0) {
+                        $result3 = mysqli_query($mysqli, $sql3);
+                        mysqli_data_seek($result3, 0); // Reset the result pointer to the beginning
+                        while ($row3 = mysqli_fetch_assoc($result3)) {
+                            // A card for each list showing the title, description, and number of items
+                            echo '<div class="card mb-3 list">';
+                            echo '<div class="row g-0">';
+                            echo '<div class="col-md-8">';
+                            echo '<div class="card-body">';
+                            echo '<h5 class="card-title title">' . $row3['listName'] . '</h5>';
+                            echo '<p class="card-text">' . $row3['description'] . '</p>';
+                            // Articles contain a list of article ids separated by commas
+                            $articles = explode(',', $row3['articles']);
+                            echo '<p class="card-text">' . count($articles) . ' items</p>';
+                            echo '<p class="card-text id" hidden>' . $row3['list_id'] . '</p>';
+                            echo '</div>';
+                            echo '</div>';
+                            echo '</div>';
+                            echo '</div>';
+                        }
+                    } else {
+                        echo '<p>No lists yet!</p>';
+                    }
                     ?>
                 </div>
+            </div>
+
             </div>
         </div>
     <!-- Include Bootstrap JS -->
@@ -258,12 +264,12 @@
         if($profilePicture != ''){
             $target = "images/profilePictures/" . basename($profilePicture);
             $sql = "UPDATE users SET profilePicture = '$target' WHERE id = '$userID'";
-            mysqli_query($conn, $sql);
+            mysqli_query($mysqli, $sql);
             move_uploaded_file($_FILES['profilePicture']['tmp_name'], $target);
         }
 
         $sql = "UPDATE users SET name = '$name', surname = '$surname', dateOfBirth = '$dateOfBirth', email = '$email', username = '$username', password = '$password' WHERE id = '$userID'";
-        mysqli_query($conn, $sql);
+        mysqli_query($mysqli, $sql);
 
         //Update session variables
         $_SESSION['username'] = $username;
@@ -300,11 +306,11 @@
             }
             $userID = $_POST['userID'];
 
-            $listName = mysqli_real_escape_string($conn, $listName);
-            $description = mysqli_real_escape_string($conn, $description);
-            $userID = mysqli_real_escape_string($conn, $userID);
+            $listName = mysqli_real_escape_string($mysqli, $listName);
+            $description = mysqli_real_escape_string($mysqli, $description);
+            $userID = mysqli_real_escape_string($mysqli, $userID);
             $sql = "INSERT INTO lists (user_id, listName, description) VALUES ('$userID', '$listName', '$description')";
-            mysqli_query($conn, $sql);
+            mysqli_query($mysqli, $sql);
             unset($_POST['createList']);
             //echo a script form to post to profile.php to refresh the page include the userID so that the profile page refreshes with the correct user
             echo '<form action="profile.php" method="POST" id="refresh">';

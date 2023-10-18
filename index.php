@@ -212,16 +212,9 @@
 <?php 
 
     //Connect to database
+    include("db_connection.php");
 
-    $mysqli = new mysqli("localhost", "root", "", "wholeartedly");
-
-    //If connect successfully echo "Connected"
-    if($mysqli){
-        echo "Connected  <br/>";
-    }
-    else{
-        echo "Not connected";
-    }
+    
 
     //Sign in functionality
     if(isset($_POST["signIn"])){

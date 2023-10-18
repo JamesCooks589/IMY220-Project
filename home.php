@@ -1,9 +1,6 @@
 <?php 
     session_start();
-    $mysqli = new mysqli("localhost", "root", "", "wholeartedly");
-    if($mysqli->connect_error){
-      die("Connection failed: " . $mysqli->connect_error);
-    }
+    include("db_connection.php");
 ?>
 
 <!DOCTYPE html>

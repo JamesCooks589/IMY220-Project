@@ -5,14 +5,11 @@
     $article_id = $_POST['id'];
 
     //Connect to database
-    $conn = mysqli_connect('localhost', 'root', '', 'wholeartedly');
-    if(!$conn){
-        die("Connection failed: ".mysqli_connect_error());
-    }
+    include('db_connection.php');
 
     //Query to get article data
     $sql = "SELECT * FROM articles WHERE article_id = '$article_id'";
-    $result = mysqli_query($conn, $sql);
+    $result = mysqli_query($mysqli, $sql);
     $row = mysqli_fetch_assoc($result);
     $articleCreatorId = $row['user_id'];
 
@@ -95,7 +92,7 @@
                             <h2>What others are thinking</h2>';
                             //Query to get reviews
                             $sql = "SELECT * FROM reviews WHERE article_id = '$article_id'";
-                            $result = mysqli_query($conn, $sql);
+                            $result = mysqli_query($mysqli, $sql);
                             if(mysqli_num_rows($result) > 0){
                                 while($row = mysqli_fetch_assoc($result)){
                                     echo '
@@ -103,7 +100,7 @@
                                             <div class="reviewer">';
                                                 //Query to get profile picture
                                                 $sql = "SELECT profilePicture FROM users WHERE username = '$row[username]' ";
-                                                $result2 = mysqli_query($conn, $sql);
+                                                $result2 = mysqli_query($mysqli, $sql);
                                                 $row2 = mysqli_fetch_assoc($result2);
                                                 echo '<img src="'.$row2['profilePicture'].'" alt="Profile Picture" class="profilePicture">
                                                 <h3>'.$row['username'].'</h3>
@@ -171,7 +168,7 @@
                                 ';
                                 //Allow user to create new list with input field and submit button or select a list to add the article to
                                 $sql = "SELECT * FROM lists WHERE user_id = '$_SESSION[id]'";
-                                $result = mysqli_query($conn, $sql);
+                                $result = mysqli_query($mysqli, $sql);
 
                                
                                 echo '
@@ -219,7 +216,7 @@
             ';
             //Edit modal with form to edit article data and submit button to submit changes
             $sql = "SELECT * FROM articles WHERE article_id = '$article_id'";
-            $result = mysqli_query($conn, $sql);
+            $result = mysqli_query($mysqli, $sql);
             $row = mysqli_fetch_assoc($result);
             echo ' 
             <div class="modal fade" id="editArticle" tabindex="-1" aria-labelledby="articleModalLabel" aria-hidden="true">
@@ -332,9 +329,9 @@
 
                 //Upload review to database in order review_id(AutoIncrement) article_id user_id reviewText	reviewImage	date(Today)	likes	dislikes
                 $sql = "INSERT INTO reviews(article_id, user_id, username, reviewText, reviewImage, date, likes, dislikes) VALUES('$article_id', '$_SESSION[id]', '$_SESSION[username]', '$review', '$target_file', '$date', 0, 0)";
-                $result = mysqli_query($conn, $sql);
+                $result = mysqli_query($mysqli, $sql);
                 if(!$result){
-                    echo "Error: ".mysqli_error($conn);
+                    echo "Error: ".mysqli_error($mysqli);
                 }
 
                 unset($_POST['submitReview']);
@@ -345,9 +342,9 @@
         else{
             //Upload review to database in order review_id(AutoIncrement) article_id user_id reviewText	reviewImage	date(Today)	likes	dislikes
             $sql = "INSERT INTO reviews(article_id, user_id, username, reviewText, reviewImage, date, likes, dislikes) VALUES('$article_id', '$_SESSION[id]', '$_SESSION[username]', '$review', '', '$date', 0, 0)";
-            $result = mysqli_query($conn, $sql);
+            $result = mysqli_query($mysqli, $sql);
             if(!$result){
-                echo "Error: ".mysqli_error($conn);
+                echo "Error: ".mysqli_error($mysqli);
             }
         }
         unset($_POST['submitReview']);
@@ -359,9 +356,9 @@
         $articleId = $_POST['id'];
         //Delete review from database
         $sql = "DELETE FROM reviews WHERE review_id = '$reviewId'";
-        $result = mysqli_query($conn, $sql);
+        $result = mysqli_query($mysqli, $sql);
         if(!$result){
-            echo "Error: ".mysqli_error($conn);
+            echo "Error: ".mysqli_error($mysqli);
         }
 
         unset($_POST['deleteReview']);
@@ -373,9 +370,9 @@
         $articleId = $_POST['id'];
         //Delete article from database
         $sql = "DELETE FROM articles WHERE article_id = '$articleId'";
-        $result = mysqli_query($conn, $sql);
+        $result = mysqli_query($mysqli, $sql);
         if(!$result){
-            echo "Error: ".mysqli_error($conn);
+            echo "Error: ".mysqli_error($mysqli);
         }
         //Echo a script to redirect to home.php
         echo '
@@ -452,17 +449,17 @@
 
             //Update article in database
             $sql = "UPDATE articles SET title = '$title', hashtags = '$hashtags', category = '$category', body = '$body', artPieceTitle = '$artPieceTitle', artist = '$artist', artPieceImage = '$target_file' WHERE article_id = '$article_id'";
-            $result = mysqli_query($conn, $sql);
+            $result = mysqli_query($mysqli, $sql);
             if(!$result){
-                echo "Error: ".mysqli_error($conn);
+                echo "Error: ".mysqli_error($mysqli);
             }
         }
         else{
             //Update article in database
             $sql = "UPDATE articles SET title = '$title', hashtags = '$hashtags', category = '$category', body = '$body', artPieceTitle = '$artPieceTitle', artist = '$artist' WHERE article_id = '$article_id'";
-            $result = mysqli_query($conn, $sql);
+            $result = mysqli_query($mysqli, $sql);
             if(!$result){
-                echo "Error: ".mysqli_error($conn);
+                echo "Error: ".mysqli_error($mysqli);
             }
         }
         unset($_POST['submitEdit']);
@@ -473,7 +470,7 @@
         $listId = $_POST['existingList'];
         //Insert article into list in database
         $sql = "SELECT * FROM lists WHERE list_id = '$listId'";
-        $result = mysqli_query($conn, $sql);
+        $result = mysqli_query($mysqli, $sql);
         $row = mysqli_fetch_assoc($result);
         $articles = $row['articles'];
         if($articles == ""){
@@ -483,9 +480,9 @@
             $articles = $articles . "," . $article_id;
         }
         $sql = "UPDATE lists SET articles = '$articles' WHERE list_id = '$listId'";
-        $result = mysqli_query($conn, $sql);
+        $result = mysqli_query($mysqli, $sql);
         if(!$result){
-            echo "Error: ".mysqli_error($conn);
+            echo "Error: ".mysqli_error($mysqli);
         }
         else{
             echo '
