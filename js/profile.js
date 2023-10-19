@@ -29,7 +29,6 @@ $(document).ready(function () {
     });
 
     $("#friends").click(function () {
-        console.log("friends");
         $(".articles").hide();
         $(".lists").hide();
         $(".friends").show();
@@ -39,8 +38,24 @@ $(document).ready(function () {
 
         $("#lists").removeClass("active");
         $("#lists").addClass("inactive");
-        
+
         $("#friends").addClass("active");
+    });
+
+    //Click for the friend card
+    $(".friend-card").click(function () {
+        const userID = $(this).find(".id").text();
+
+        const form = $("<form>")
+            .attr("method", "post")
+            .attr("action", "profile.php")
+            .append($("<input>")
+                .attr("type", "hidden")
+                .attr("name", "userID")
+                .val(userID));
+
+        $("body").append(form);
+        form.submit();
     });
 });
 

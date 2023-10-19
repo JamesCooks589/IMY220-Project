@@ -462,6 +462,12 @@
                 echo "Error: ".mysqli_error($mysqli);
             }
         }
+        //Tell user that article was updated
+        echo '
+            <script>
+                alert("Article updated");
+            </script>
+        ';
         unset($_POST['submitEdit']);
     }
 

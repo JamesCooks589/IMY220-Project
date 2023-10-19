@@ -88,6 +88,10 @@
                             echo '<p>Last Name: ' . $row['surname'] . '</p>';
                             echo '<p>Date of Birth: ' . $row['dateOfBirth'] . '</p>';
                             echo '<button class="btn btn-primary" id="editProfile" data-bs-toggle="modal" data-bs-target="#editProfileModal">Edit Profile</button>';
+                            echo '<form action="logout.php" method="post" id="logout-form">';
+                            echo '<button type="submit" class="btn btn-danger" id="logout">Logout</button>';
+                            echo '</form>';
+
                             
                             // Edit Profile Modal
                             echo '<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">';
@@ -254,15 +258,12 @@
 
                         // Display the friend's information in a card
                         echo '<div class="friend-card card mb-4">';
-                        echo '<img src="' . $friendInfo['profilePicture'] . '" class="card-img-top" alt="Friend Profile Picture">';
-                        echo '<div class="card-body">';
+                        echo '<div class="card-header">';
                         echo '<h5 class="card-title">' . $friendInfo['username'] . '</h5>';
-                        echo '<p class="card-text">Name: ' . $friendInfo['name'] . ' ' . $friendInfo['surname'] . '</p>';
-                        echo '<p class="card-text">Email: ' . $friendInfo['email'] . '</p>';
-                        echo '<form action="profile.php" method="POST" style="display: inline;">';
-                        echo '<input type="hidden" name="userID" value="' . $friendInfo['id'] . '">';
-                        echo '<button type="submit" class="btn btn-primary" name="visitProfile">Visit Profile</button>';
-                        echo '</form>';
+                        echo '</div>';
+                        echo '<div class="card-body">';
+                        echo '<img src="' . $friendInfo['profilePicture'] . '" alt="Profile Picture" class="img-fluid">';
+                        echo '<p class="card-text id" hidden>' . $friendInfo['id'] . '</p>';
                         echo '</div>';
                         echo '</div>';
                     }

@@ -20,6 +20,7 @@ Sure, here's a condensed plan for 8 days, with more work scheduled on the weeken
 **Day 5: October 21st (Weekend)**
 - Search bar (Articles by name, date, or summary).
 - Add "Read" functionality to articles and the profile page.
+- Message functionality and friend requests.
 
 **Day 6: October 22nd (Weekend)**
 - Implement random profile images.
@@ -38,7 +39,6 @@ Sure, here's a condensed plan for 8 days, with more work scheduled on the weeken
 - Longer Tasks and optional feature:
    - Delete a profile and all associated articles.
    - In lists, check if all articles still exist.
-- Message functionality and friend requests.
 - Proper testing and setting up the project for demoing.
 
 This plan provides more intensive work over the weekend when you might have more time and energy to dedicate to the project. It also ensures that you allocate the 25th for the more time-consuming tasks of message functionality and friend requests, followed by testing and project setup on the 26th.
