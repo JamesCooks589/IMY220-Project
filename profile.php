@@ -56,15 +56,24 @@
                 echo '<h1>Hello ' . $_SESSION['username'] . '!</h1>';
             }else{
                 echo '<h1>Say hello to ' . $row['username'] . '!</h1>';
-                //If user is not friends with the profile they are viewing, show add friend button or if they are friends, show remove friend button
-                $friends = $row['friends'];
-                $friendsArray = explode(',', $friends);
-                if(!in_array($_SESSION['id'], $friendsArray)){
-                    echo '<form action="" method="POST"><input type="hidden" name="userID" value="' . $userID . '"><button class="btn btn-primary addFriend" name="addFriend">Add Friend</button></form>';
+                if($row['followers'] != ''){
+                    $followers = $row['followers'];
+                    $followersArray = explode(',', $followers);
                 }else{
-                    echo '<form action="" method="POST"><input type="hidden" name="userID" value="' . $userID . '"><button class="btn btn-primary removeFriend" name="removeFriend">Remove Friend</button></form>';
-                    //Message button
-                    echo '<form action="messages.php" method="POST"><input type="hidden" name="userID" value="' . $userID . '"><button class="btn btn-primary message" name="message">Message</button></form>';
+                    $followersArray = array();
+                }
+                //IF user is not the owner of the profile, or following the owner of the profile, show follow button
+                if($userID != $_SESSION['id'] && !in_array($_SESSION['id'], $followersArray)){
+                    echo '<form action="" method="POST" id="follow">';
+                    echo '<input type="hidden" name="userID" value="' . $userID . '">';
+                    echo '<button type="submit" class="btn btn-primary" name="follow">Follow</button>';
+                    echo '</form>';
+                }
+                else{
+                    echo '<form action="" method="POST" id="unfollow">';
+                    echo '<input type="hidden" name="userID" value="' . $userID . '">';
+                    echo '<button type="submit" class="btn btn-danger" name="unfollow">Unfollow</button>';
+                    echo '</form>';
                 }
             }
 
@@ -136,14 +145,17 @@
                 <!--Only show lists if the userID and session id are the same-->
                 <div class="col-md-8 articleAndList">
                 <?php 
-                    $friends = $row['friends'];
-                    $friendsArray = explode(',', $friends);
+                    $followers = $row['followers'];
+                    $followersArray = explode(',', $followers);
+                    $following = $row['following'];
+                    $followingArray = explode(',', $following);
                     // If the user is the owner of the profile, display toggle buttons between lists and articles
-                    if ($userID == $_SESSION['id'] || in_array($_SESSION['id'], $friendsArray)) {
+                    if ($userID == $_SESSION['id'] || in_array($_SESSION['id'], $followingArray)) {
                         echo '<div class="toggle">';
                         echo '<button class="btn btn-primary active" id="articles">Articles</button>';
                         echo '<button class="btn btn-primary inactive" id="lists">Lists</button>';
-                        echo '<button class="btn btn-primary inactive" id="friends">Friends</button>';
+                        echo '<button class="btn btn-primary inactive" id="followers">Followers</button>';
+                        echo '<button class="btn btn-primary inactive" id="following">Following</button>';
                         echo '</div>';
                     }
                 ?>
@@ -242,39 +254,75 @@
                     ?>
                 </div>
 
-                <!--Friends-->
-                <div class="friends" style="display: none">
-                <h2>Friends</h2>
-                <div class="friends-list">
+                <!--Followers-->
+                <div class="followers" style="display:none">
                     <?php
-                    // Display a list of friends here
-                    foreach ($friendsArray as $friendID) {
-                        $friendID = mysqli_real_escape_string($mysqli, $friendID);
-
-                        // Query to retrieve the friend's information
-                        $friendInfoSql = "SELECT * FROM users WHERE id = '$friendID'";
-                        $friendInfoResult = mysqli_query($mysqli, $friendInfoSql);
-                        $friendInfo = mysqli_fetch_assoc($friendInfoResult);
-
-                        // Display the friend's information in a card
-                        echo '<div class="friend-card card mb-4">';
-                        echo '<div class="card-header">';
-                        echo '<h5 class="card-title">' . $friendInfo['username'] . '</h5>';
-                        echo '</div>';
-                        echo '<div class="card-body">';
-                        echo '<img src="' . $friendInfo['profilePicture'] . '" alt="Profile Picture" class="img-fluid">';
-                        echo '<p class="card-text id" hidden>' . $friendInfo['id'] . '</p>';
-                        echo '</div>';
-                        echo '</div>';
+                    // Loop through followers and display them
+                    if ($row['followers'] != '') {
+                        echo '<h2>Followers</h2>';
+                        $followers = $row['followers'];
+                        $followersArray = explode(',', $followers);
+                        foreach ($followersArray as $followerID) {
+                            $sql = "SELECT * FROM users WHERE id = '$followerID'";
+                            $result = mysqli_query($mysqli, $sql);
+                            $row = mysqli_fetch_assoc($result);
+                            // A card for each follower showing the username and profile picture
+                            echo '<div class="card mb-3 follower">';
+                            echo '<div class="row g-0">';
+                            echo '<div class="col-md-4">';
+                            echo '<div class="card-header">';
+                            echo '<h5 class="card-title title">' . $row['username'] . '</h5>';
+                            echo '</div>';
+                            echo '<div class="card-body">';
+                            echo '<img src="' . $row['profilePicture'] . '" alt="Profile Picture" class="img-fluid">';
+                            echo '</div>';
+                            echo '</div>';
+                            
+                            echo '</div>';
+                            echo '</div>';
+                        }
+                    } else {
+                        echo '<p>No followers yet!</p>';
                     }
                     ?>
-    </div>
-</div>
-
-            </div>
-
+                </div>
+                
+                <!--Following-->
+                <div class="following" style="display:none">
+                    <?php
+                    // Loop through following and display them
+                    if ($row['following'] != '') {
+                        echo '<h2>Following</h2>';
+                        $following = $row['following'];
+                        $followingArray = explode(',', $following);
+                        foreach ($followingArray as $followingID) {
+                            $sql = "SELECT * FROM users WHERE id = '$followingID'";
+                            $result = mysqli_query($mysqli, $sql);
+                            $row = mysqli_fetch_assoc($result);
+                            // A card for each following showing the username and profile picture
+                            echo '<div class="card mb-3 following">';
+                            echo '<div class="row g-0">';
+                            echo '<div class="col-md-4">';
+                            echo '<div class="card-header">';
+                            echo '<h5 class="card-title title">' . $row['username'] . '</h5>';
+                            echo '</div>';
+                            echo '<div class="card-body">';
+                            echo '<img src="' . $row['profilePicture'] . '" alt="Profile Picture" class="img-fluid">';
+                            echo '</div>';
+                            echo '</div>';
+                            
+                            echo '</div>';
+                            echo '</div>';
+                        }
+                    } else {
+                        echo '<p>Not following anyone yet!</p>';
+                    }
+                    ?>
+                </div>
             </div>
         </div>
+    </div>
+    </div>
     <!-- Include Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
 
@@ -375,6 +423,80 @@
             $sql = "INSERT INTO lists (user_id, listName, description) VALUES ('$userID', '$listName', '$description')";
             mysqli_query($mysqli, $sql);
             unset($_POST['createList']);
+            //echo a script form to post to profile.php to refresh the page include the userID so that the profile page refreshes with the correct user
+            echo '<form action="profile.php" method="POST" id="refresh">';
+            echo '<input type="hidden" name="userID" value="' . $userID . '">';
+            echo '</form>';
+            echo '<script type="text/javascript">';
+            echo 'document.getElementById("refresh").submit();';
+            echo '</script>';
+        }
+
+        //Follow user
+        //Add my id to their followers and add their id to my following
+        //Followers and following are both just a string list of ids seperated by commas
+        //So if it is empty, just add the id else add a comma and the id
+        if(isset($_POST['follow'])){
+            $userID = $_POST['userID'];
+            $sql = "SELECT * FROM users WHERE id = '$userID'";
+            $result = mysqli_query($mysqli, $sql);
+            $row = mysqli_fetch_assoc($result);
+            $followers = $row['followers'];
+            if($followers == ''){
+                $followers = $_SESSION['id'];
+            }else{
+                $followers = $followers . ',' . $_SESSION['id'];
+            }
+            $sql = "UPDATE users SET followers = '$followers' WHERE id = '$userID'";
+            mysqli_query($mysqli, $sql);
+
+            $sql = "SELECT * FROM users WHERE id = '" . $_SESSION['id'] . "'";
+            $result = mysqli_query($mysqli, $sql);
+            $row = mysqli_fetch_assoc($result);
+            $following = $row['following'];
+            if($following == ''){
+                $following = $userID;
+            }else{
+                $following = $following . ',' . $userID;
+            }
+            $sql = "UPDATE users SET following = '$following' WHERE id = '" . $_SESSION['id'] . "'";
+            mysqli_query($mysqli, $sql);
+
+            unset($_POST['follow']);
+            //echo a script form to post to profile.php to refresh the page include the userID so that the profile page refreshes with the correct user
+            echo '<form action="profile.php" method="POST" id="refresh">';
+            echo '<input type="hidden" name="userID" value="' . $userID . '">';
+            echo '</form>';
+            echo '<script type="text/javascript">';
+            echo 'document.getElementById("refresh").submit();';
+            echo '</script>';
+        }
+
+        //Unfollow user
+        //Remove my id from their followers and remove their id from my following
+        if(isset($_POST['unfollow'])){
+            $userID = $_POST['userID'];
+            $sql = "SELECT * FROM users WHERE id = '$userID'";
+            $result = mysqli_query($mysqli, $sql);
+            $row = mysqli_fetch_assoc($result);
+            $followers = $row['followers'];
+            $followersArray = explode(',', $followers);
+            $followersArray = array_diff($followersArray, array($_SESSION['id']));
+            $followers = implode(',', $followersArray);
+            $sql = "UPDATE users SET followers = '$followers' WHERE id = '$userID'";
+            mysqli_query($mysqli, $sql);
+
+            $sql = "SELECT * FROM users WHERE id = '" . $_SESSION['id'] . "'";
+            $result = mysqli_query($mysqli, $sql);
+            $row = mysqli_fetch_assoc($result);
+            $following = $row['following'];
+            $followingArray = explode(',', $following);
+            $followingArray = array_diff($followingArray, array($userID));
+            $following = implode(',', $followingArray);
+            $sql = "UPDATE users SET following = '$following' WHERE id = '" . $_SESSION['id'] . "'";
+            mysqli_query($mysqli, $sql);
+
+            unset($_POST['unfollow']);
             //echo a script form to post to profile.php to refresh the page include the userID so that the profile page refreshes with the correct user
             echo '<form action="profile.php" method="POST" id="refresh">';
             echo '<input type="hidden" name="userID" value="' . $userID . '">';

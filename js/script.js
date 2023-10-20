@@ -17,8 +17,11 @@ $(document).ready(function() {
     function animateFeatures() {
       $('.feature').each(function() {
         if (isElementInViewport($(this))) {
+          //Add dynamic delay to each feature
+          $(this).css('animation-delay', ($(this).index() + 1) * 0.5 + 's');
           $(this).css('opacity', 1);
           $(this).addClass('slide-in'); // You can add a slide-in class for the animation effect
+          
         }
       });
     }

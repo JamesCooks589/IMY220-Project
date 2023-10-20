@@ -11,30 +11,46 @@
 
 /*Navigation*/
 
-    nav {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0 2%;
-        height: 10%;
-
+/* Center the "feeds" div at the top */
+#feeds {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px; /* Adjust the margin as needed */
+  }
+  
+  /* Style the buttons inside the "feeds" div */
+  #feeds button {
+    margin: 1% 10px; 
+  }
+  
+  /* Style the banner */
+    #banner {
+        width: 100%; /* Adjust the width as needed */
+        height: auto; /* Ensure the image's aspect ratio is maintained */
     }
-
-    #feeds {
-        width:100%;
-        display: flex;
-        justify-content: center;
-        height: 3%;
+    
+    /* Set the top position of the profile picture based on the banner's height */
+    #profilePicture {
+        position: absolute;
+        /* Adjust the top position based on height of the banner */
+        top:  25%;
+        right: 20px; /* Adjust the right position as needed */
     }
-
-    #profile-pic{
-        float: right;
-        margin-right: 2%;
-        margin-top: 2%;
-        width: 5%;
-        height: 5%;
-        border-radius: 50%;
+    
+    /* Style the profile picture */
+    #profile-pic {
+        width: 100px; /* Adjust the width as needed */
+        height: 100px; /* Adjust the height as needed */
+        border: 2px solid white;
     }
+    
+    /* Style the hidden input with user id */
+    #userID {
+        display: none; /* Hide the input element */
+    }
+  
+  
 
     #local {
         margin-right: 2%;
@@ -78,6 +94,11 @@
         background-color: #146aa3;
         box-shadow: 0 0 10px 0 rgba(0,0,0,0.5);
         width: 100%;
+    }
+
+    .article:hover {
+        transform: scale(1.05);
+        transition: all 0.5s ease-in-out;
     }
 
     .title {

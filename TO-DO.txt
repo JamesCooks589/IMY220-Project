@@ -15,12 +15,14 @@ Sure, here's a condensed plan for 8 days, with more work scheduled on the weeken
 
 **Day 4: October 20th (Weekend)**
 - Local and Global activity feeds.
+- Likes and dislikes.
 - Search bar (Return links, Users by name, username, or email).
+- Friends
 
 **Day 5: October 21st (Weekend)**
 - Search bar (Articles by name, date, or summary).
 - Add "Read" functionality to articles and the profile page.
-- Message functionality and friend requests.
+- Message functionality.
 
 **Day 6: October 22nd (Weekend)**
 - Implement random profile images.
@@ -33,7 +35,7 @@ Sure, here's a condensed plan for 8 days, with more work scheduled on the weeken
    - Manage articles.
    - Manage accounts.
    - Add new categories.
-   - Implement "Sign up auto-logs in."
+-Add that cool logo thing on splash page
 
 **Day 8: October 26th**
 - Longer Tasks and optional feature:

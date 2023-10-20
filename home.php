@@ -38,7 +38,7 @@
     </div>
     
     <div id="profilePicture">
-      <img src="images/profilePictures/placeholder.jpg" alt="Profile Picture" class="img-fluid rounded-circle" id="profile-pic">
+      <img src=<?php echo $_SESSION['profilePicture'] ?> alt="Profile Picture" class="img-fluid rounded-circle" id="profile-pic">
       <!-- hidden input with user id -->
       <input type="hidden" id="userID" value="<?php echo $_SESSION['id'] ?>">
     </div>
@@ -140,17 +140,17 @@
                         <label for="categorySelect" class="form-label">Category</label>
                         <select class="form-select" id="categorySelect" name="categorySelect" required>
                         <option value="" disabled selected>Select a category</option>
-                          <option value="visual_art">Visual Art</option>
-                          <option value="sculpture">Sculpture</option>
-                          <option value="music">Music</option>
-                          <option value="literature">Literature</option>
-                          <option value="performing_art">Performing Art</option>
-                          <option value="theatre">Theatre</option>
-                          <option value="film">Film</option>
-                          <option value="architecture">Architecture</option>
-                          <option value="fashion">Fashion</option>
-                          <option value="photography">Photography</option>
-                          <option value="digital_art">Digital Art</option>
+                          <option value="Visual Art">Visual Art</option>
+                          <option value="Sculpture">Sculpture</option>
+                          <option value="Music">Music</option>
+                          <option value="Literature">Literature</option>
+                          <option value="Performing Art">Performing Art</option>
+                          <option value="Theatre">Theatre</option>
+                          <option value="Film">Film</option>
+                          <option value="Architecture">Architecture</option>
+                          <option value="Fashion">Fashion</option>
+                          <option value="Photography">Photography</option>
+                          <option value="Digital Art">Digital Art</option>
                         </select>
                     </div>
                     <!--Image upload-->

@@ -1,37 +1,48 @@
-
 $(document).ready(function () {
     $("#articles").click(function () {
-        $(".articles").show();
+        $(".bigArticles").show();
         $(".lists").hide();
-        $(".friends").hide();
+        $(".followers").hide();
+        $(".following").hide();
 
         $("#articles").addClass("active");
+        $("#articles").removeClass("inactive");
 
         $("#lists").removeClass("active");
         $("#lists").addClass("inactive");
 
-        $("#friends").removeClass("active");
-        $("#friends").addClass("inactive");
+        $("#followers").removeClass("active");
+        $("#followers").addClass("inactive");
+
+        $("#following").removeClass("active");
+        $("#following").addClass("inactive");
     });
 
     $("#lists").click(function () {
-        $(".articles").hide();
+        $(".bigArticles").hide();
         $(".lists").show();
-        $(".friends").hide();
+        $(".followers").hide();
+        $(".following").hide();
 
         $("#articles").removeClass("active");
         $("#articles").addClass("inactive");
 
         $("#lists").addClass("active");
+        $("#lists").removeClass("inactive");
 
-        $("#friends").removeClass("active");
-        $("#friends").addClass("inactive");
+        $("#followers").removeClass("active");
+        $("#followers").addClass("inactive");
+
+        $("#following").removeClass("active");
+        $("#following").addClass("inactive");
     });
 
-    $("#friends").click(function () {
-        $(".articles").hide();
+    $("#followers").click(function () {
+        console.log("followers");
+        $(".bigArticles").hide();
         $(".lists").hide();
-        $(".friends").show();
+        $(".followers").show();
+        $(".following").hide();
 
         $("#articles").removeClass("active");
         $("#articles").addClass("inactive");
@@ -39,23 +50,31 @@ $(document).ready(function () {
         $("#lists").removeClass("active");
         $("#lists").addClass("inactive");
 
-        $("#friends").addClass("active");
+        $("#followers").addClass("active");
+        $("#followers").removeClass("inactive");
+
+        $("#following").removeClass("active");
+        $("#following").addClass("inactive");
     });
 
-    //Click for the friend card
-    $(".friend-card").click(function () {
-        const userID = $(this).find(".id").text();
+    $("#following").click(function () {
+        console.log("following");
+        $(".bigArticles").hide();
+        $(".lists").hide();
+        $(".followers").hide();
+        $(".following").show();
 
-        const form = $("<form>")
-            .attr("method", "post")
-            .attr("action", "profile.php")
-            .append($("<input>")
-                .attr("type", "hidden")
-                .attr("name", "userID")
-                .val(userID));
+        $("#articles").removeClass("active");
+        $("#articles").addClass("inactive");
 
-        $("body").append(form);
-        form.submit();
+        $("#lists").removeClass("active");
+        $("#lists").addClass("inactive");
+        
+        $("#followers").removeClass("active");
+        $("#followers").addClass("inactive");
+
+        $("#following").addClass("active");
+        $("#following").removeClass("inactive");
     });
+
 });
-

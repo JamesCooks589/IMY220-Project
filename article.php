@@ -277,14 +277,14 @@
     //Add review
     if(isset($_POST['submitReview'])){
         $review = $_POST['review'];
+        $articleId = $_POST['id'];
         if($review == ""){
             echo "<script>alert('Please write a review.')</script>";
         }
         $date = date("Y-m-d");
         $intArticleId = (int)$article_id;
-        //If there is an image upload the  name of the image otherwise set it to empty
-        //Check if file is of type image
-        if(isset($_FILES['reviewImage'])){
+        //If there is an image upload the  name of the image otherwise set it to empty 
+        if($_FILES['reviewImage']['name'] != ""){
             $target_dir = "images/reviews/";
             $target_file = $target_dir . basename($_FILES['reviewImage']['name']);
             $uploadOK = 1;
@@ -314,6 +314,14 @@
             //Check if uploadOK is set to 0 by an error
             if($uploadOk == 0){
                 echo "<script>alert('File was not uploaded.')</script>";
+
+                //Repost back to article.php with article_id
+                    echo '<form method="POST" action="article.php" id="redirect">
+                            <input hidden type="text" name="id" id="id" value="'.$articleId.'">
+                                <script>
+                                    document.getElementById("redirect").submit();
+                                </script>
+                            </form>';
             }
             else{
                 //Hash filename + current unix time to create unique name
@@ -335,6 +343,14 @@
                 }
 
                 unset($_POST['submitReview']);
+
+                //Repost back to article.php with article_id
+                echo '<form method="POST" action="article.php" id="redirect">
+                <input hidden type="text" name="id" id="id" value="'.$articleId.'">
+                <script>
+                    document.getElementById("redirect").submit();
+                </script>
+                </form>';
             }
 
 
@@ -348,12 +364,29 @@
             }
         }
         unset($_POST['submitReview']);
+
+        echo '<form method="POST" action="article.php" id="redirect">
+                <input hidden type="text" name="id" id="id" value="'.$articleId.'">
+                <script>
+                    document.getElementById("redirect").submit();
+                </script>
+                </form>';
     }
 
     //Delete review
     if(isset($_POST['deleteReview'])){
         $reviewId = $_POST['reviewId'];
         $articleId = $_POST['id'];
+
+        //Remove image from folder
+        $sql = "SELECT reviewImage FROM reviews WHERE review_id = '$reviewId'";
+        $result = mysqli_query($mysqli, $sql);
+        $row = mysqli_fetch_assoc($result);
+        $image = $row['reviewImage'];
+        if($image != ""){
+            unlink($image);
+        }
+
         //Delete review from database
         $sql = "DELETE FROM reviews WHERE review_id = '$reviewId'";
         $result = mysqli_query($mysqli, $sql);
@@ -361,7 +394,20 @@
             echo "Error: ".mysqli_error($mysqli);
         }
 
+
+
         unset($_POST['deleteReview']);
+
+        //Repost back to article.php with article_id
+        echo '<form method="POST" action="article.php" id="redirect">
+                <input hidden type="text" name="id" id="id" value="'.$articleId.'">
+                <script>
+                    document.getElementById("redirect").submit();
+                </script>
+            </form>';
+
+
+        
         
     }
 
@@ -468,6 +514,14 @@
                 alert("Article updated");
             </script>
         ';
+
+        //Repost back to article.php with article_id
+        echo '<form method="POST" action="article.php" id="redirect">
+                <input hidden type="text" name="id" id="id" value="'.$articleId.'">
+                <script>
+                    document.getElementById("redirect").submit();
+                </script>
+            </form>';
         unset($_POST['submitEdit']);
     }
 
