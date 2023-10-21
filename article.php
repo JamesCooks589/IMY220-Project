@@ -13,6 +13,25 @@
     $row = mysqli_fetch_assoc($result);
     $articleCreatorId = $row['user_id'];
 
+    //Likes and dislikes are stored in database as a string of user ids seperated by commas
+    //Explode string into array
+    $likes = explode(",", $row['likes']);
+    $dislikes = explode(",", $row['dislikes']);
+
+    $likeCount = 0;
+    foreach($likes as $like){
+        if($like != ""){
+            $likeCount++;
+        }
+    }
+
+    $dislikeCount = 0;
+    foreach($dislikes as $dislike){
+        if($dislike != ""){
+            $dislikeCount++;
+        }
+    }
+
     //Make html page
     echo '
         <!DOCTYPE html>
@@ -39,7 +58,7 @@
         
         <head>
         <body>
-            <div class="container">
+            <div class="fluid-container">
                 <div class="row">
                     <div class="logo col-md-2">
                         <a href="home.php"><img src="images/logo/dark1.png" alt="Whole Artedly Logo"></a>
@@ -65,15 +84,46 @@
                         </div>';
 
                         echo '<div class="userReview">
-                            <div class="like-dislike">
-                                <div class="likes">
-                                    <h6>'.$row['likes'].'</h6>
-                                    <button type="button" class="btn btn-primary" id="like"><i class="lni lni-thumbs-up"></i></button>
-                                </div>
-                                <div class="dislikes">
-                                    <h6>'.$row['dislikes'].'</h6>
-                                    <button type="button" class="btn btn-primary" id="dislike"><i class="lni lni-thumbs-down"></i></button>
-                                </div>
+                            <div class="like-dislike">';
+                            echo '<div class="likes">';
+                                echo'<form method = "POST" action="">
+                                    <input hidden type="text" name="id" id="id" value="'.$article_id.'">
+                                    <p>'.$likeCount.'</p>';
+                                    //If the $_SESSION['id'] is in the likes array then the user has liked the article so give the liked button class active
+                                    $likes = explode(",", $row['likes']);
+                                    $liked = false;
+                                    foreach($likes as $like){
+                                        if($like == $_SESSION['id']){
+                                            $liked = true;
+                                        }
+                                    }
+                                    if($liked){
+                                        echo '<button type="submit" class="btn btn-primary active" name="like" id="like"><i class="lni lni-thumbs-up"></i></button>';
+                                    }
+                                    else{
+                                        echo '<button type="submit" class="btn btn-primary" name="like" id="like"><i class="lni lni-thumbs-up"></i></button>';
+                                    }
+                                echo '</form>';
+                            echo '</div>';
+                            echo '<div class="dislikes">';
+                            echo '<form method="POST" action="">
+                                    <input hidden type="text" name="id" id="id" value="'.$article_id.'">
+                                    <p>'.$dislikeCount.'</p>';
+                                    //If the $_SESSION['id'] is in the dislikes array then the user has disliked the article so give the disliked button class active
+                                    $dislikes = explode(",", $row['dislikes']);
+                                    $disliked = false;
+                                    foreach($dislikes as $dislike){
+                                        if($dislike == $_SESSION['id']){
+                                            $disliked = true;
+                                        }
+                                    }
+                                    if($disliked)
+                                    echo '<button type="submit" class="btn btn-primary active" name="dislike" id="dislike"><i class="lni lni-thumbs-down"></i></button>';
+                                    else
+                                    echo '<button type="submit" class="btn btn-primary" name="dislike" id="dislike"><i class="lni lni-thumbs-down"></i></button>';
+                                echo '</form>';
+                            echo '</div>';
+                        echo '    
                             </div>
                             <h2>What did you think of this article?</h2>
                             <form method="POST" action="" enctype="multipart/form-data">
@@ -96,7 +146,23 @@
                             if(mysqli_num_rows($result) > 0){
                                 while($row = mysqli_fetch_assoc($result)){
                                     echo '
-                                        <div class="review">
+                                        <div class="review">';
+                                            $reviewLikeCount = 0;
+                                            $reviewDislikeCount = 0;
+                                            $reviewLikes = explode(",", $row['likes']);
+                                            $reviewDislikes = explode(",", $row['dislikes']);
+                                            foreach($reviewLikes as $reviewLike){
+                                                if($reviewLike != ""){
+                                                    $reviewLikeCount++;
+                                                }
+                                            }
+                                            foreach($reviewDislikes as $reviewDislike){
+                                                if($reviewDislike != ""){
+                                                    $reviewDislikeCount++;
+                                                }
+                                            }
+
+                                            echo'
                                             <div class="reviewer">';
                                                 //Query to get profile picture
                                                 $sql = "SELECT profilePicture FROM users WHERE username = '$row[username]' ";
@@ -117,35 +183,64 @@
                                             <div class="review-footer">
                                                 <h6>'.$row['date'].'</h6>
                                                 <div class="like-dislike">
-                                                    <button type="button" class="btn btn-primary" id="like"><i class="lni lni-thumbs-up"></i></button>
-                                                    <button type="button" class="btn btn-primary" id="dislike"><i class="lni lni-thumbs-down"></i></button>
+                                                    <div="reviewLike">
+                                                        <form method="POST" action="">
+                                                            <input hidden type="text" name="id" id="id" value="'.$article_id.'">
+                                                            <input hidden type="text" name="reviewId" id="reviewId" value="'.$row['review_id'].'">
+                                                            <p>'.$reviewLikeCount.'</p>';
+                                                            //If the $_SESSION['id'] is in the likes array then the user has liked the review so give the liked button class active
+                                                            $likes = explode(",", $row['likes']);
+                                                            $liked = false;
+                                                            foreach($likes as $like){
+                                                                if($like == $_SESSION['id']){
+                                                                    $liked = true;
+                                                                }
+                                                            }
+                                                            if($liked){
+                                                                echo '<button type="submit" class="btn btn-primary active" name="reviewLike" id="reviewLike"><i class="lni lni-thumbs-up"></i></button>';
+                                                            }
+                                                            else{
+                                                                echo '<button type="submit" class="btn btn-primary" name="reviewLike" id="reviewLike"><i class="lni lni-thumbs-up"></i></button>';
+                                                            }
+                                                        echo '</form>
+                                                    </div>
+                                                    <div="reviewDislike">
+                                                        <form method="POST" action="">
+                                                            <input hidden type="text" name="id" id="id" value="'.$article_id.'">
+                                                            <input hidden type="text" name="reviewId" id="reviewId" value="'.$row['review_id'].'">
+                                                            <p>'.$reviewDislikeCount.'</p>';
+                                                            //If the $_SESSION['id'] is in the dislikes array then the user has disliked the review so give the disliked button class active
+                                                            $dislikes = explode(",", $row['dislikes']);
+                                                            $disliked = false;
+                                                            foreach($dislikes as $dislike){
+                                                                if($dislike == $_SESSION['id']){
+                                                                    $disliked = true;
+                                                                }
+                                                            }
+                                                            if($disliked){
+                                                                echo '<button type="submit" class="btn btn-primary active" name="reviewDislike" id="reviewDislike"><i class="lni lni-thumbs-down"></i></button>';
+                                                            }
+                                                            else{
+                                                                echo '<button type="submit" class="btn btn-primary" name="reviewDislike" id="reviewDislike"><i class="lni lni-thumbs-down"></i></button>';
+                                                            }
+                                                        echo '</form>
                                                 </div>
                                             </div>';
+                                            //If the user is the owner of the article or the review allow them to edit or delete the review
                                             if(isset($_SESSION['id'])){
-                                                if($_SESSION['id'] == $row['user_id']){
-                                                    //form to delete review
+                                                if($_SESSION['id'] == $articleCreatorId || $_SESSION['id'] == $row['user_id']){
+                                                    echo '
+                                                    <div class="edit-delete">';
+                                                    //Edit button to toggle edit modal and delete button in a form
                                                     echo '
                                                         <form method="POST" action="">
+                                                            <input hidden type="text" name="id" id="id" value="'.$article_id.'">
                                                             <input hidden type="text" name="reviewId" id="reviewId" value="'.$row['review_id'].'">
-                                                            <input hidden type="text" name="id" id="articleId" value="'.$article_id.'">
-                                                            <button type="submit" class="btn btn-primary" name="deleteReview" id="deleteReview">Delete</button>
-                                                        </form>
-                                                    ';
+                                                            <button type="submit" class="btn btn-danger" name="deleteReview" id="deleteReview">Delete Review</button>
+                                                        </form>';
+                                                    echo '</div>';
                                                 }
-                                                //Else if it is the creator of the article allow them to also delete reviews
-                                                else if($_SESSION['id'] == $articleCreatorId){
-                                                    //form to delete review
-                                                    echo '
-                                                        <form method="POST" action="">
-                                                            <input hidden type="text" name="reviewId" id="reviewId" value="'.$row['review_id'].'">
-                                                            <input hidden type="text" name="id" id="articleId" value="'.$article_id.'">
-                                                            <button type="submit" class="btn btn-primary" name="deleteReview" id="deleteReview">Delete</button>
-                                                        </form>
-                                                    ';
-                                                }
-                                            }
-                                        echo '</div>
-                                    ';
+                                            }             
                                 }
                             }
                             else{
@@ -404,12 +499,10 @@
                 <script>
                     document.getElementById("redirect").submit();
                 </script>
-            </form>';
-
-
-        
+            </form>';   
         
     }
+
 
     //Delete article and redirect to home.php
     if(isset($_POST['delete'])){
@@ -552,5 +645,308 @@
             ';
         }
         unset($_POST['submitExistingList']);
+    }
+
+    //Like article
+    //If the user has already liked the article do nothing
+    //If the user has disliked the article remove their id from dislikes and add it to likes
+    //Else add their id to likes (IF likes is empty add their id to likes otherwise add a comma and their id to likes)
+    if(isset($_POST['like'])){
+        $articleId = $_POST['id'];
+        $sql = "SELECT * FROM articles WHERE article_id = '$articleId'";
+        $result = mysqli_query($mysqli, $sql);
+        $row = mysqli_fetch_assoc($result);
+        $likes = explode(",", $row['likes']);
+        $dislikes = explode(",", $row['dislikes']);
+        $liked = false;
+        foreach($likes as $like){
+            if($like == $_SESSION['id']){
+                $liked = true;
+            }
+        }
+        if($liked){
+            //Do nothing
+        }
+        else{
+            $disliked = false;
+            foreach($dislikes as $dislike){
+                if($dislike == $_SESSION['id']){
+                    $disliked = true;
+                }
+            }
+            if($disliked){
+                //If there is only one dislike remove the user id from dislikes and set dislikes to empty else remove the user id from dislikes
+                if(count($dislikes) == 1){
+                    $dislikes = array_diff($dislikes, array($_SESSION['id']));
+                    $dislikes =  "";
+                }
+                else{
+                    $dislikes = array_diff($dislikes, array($_SESSION['id']));
+                    $dislikes = implode(",", $dislikes);
+                }
+
+                if($row['likes'] == ""){
+                    $likes = $_SESSION['id'];
+                }
+                else{
+                    $likes = $row['likes'] . "," . $_SESSION['id'];
+                }
+                $sql = "UPDATE articles SET likes = '$likes', dislikes = '$dislikes' WHERE article_id = '$articleId'";
+                $result = mysqli_query($mysqli, $sql);
+                if(!$result){
+                    echo "Error: ".mysqli_error($mysqli);
+                }
+            }
+            else{
+                if($row['likes'] == ""){
+                    $likes = $_SESSION['id'];
+                }
+                else{
+                    $likes = $row['likes'] . "," . $_SESSION['id'];
+                }
+                $sql = "UPDATE articles SET likes = '$likes' WHERE article_id = '$articleId'";
+                $result = mysqli_query($mysqli, $sql);
+                if(!$result){
+                    echo "Error: ".mysqli_error($mysqli);
+                }
+            }
+        }
+        unset($_POST['like']);
+
+        //Repost back to article.php with article_id
+        echo '<form method="POST" action="article.php" id="redirect">
+                <input hidden type="text" name="id" id="id" value="'.$articleId.'">
+                <script>
+                    document.getElementById("redirect").submit();
+                </script>
+            </form>';
+    }
+
+    //Dislike article
+    //If the user has already disliked the article do nothing
+    //If the user has liked the article remove their id from likes and add it to dislikes
+    //Else add their id to dislikes (IF dislikes is empty add their id to dislikes otherwise add a comma and their id to dislikes)
+    if(isset($_POST['dislike'])){
+        $articleId = $_POST['id'];
+        $sql = "SELECT * FROM articles WHERE article_id = '$articleId'";
+        $result = mysqli_query($mysqli, $sql);
+        $row = mysqli_fetch_assoc($result);
+        $likes = explode(",", $row['likes']);
+        $dislikes = explode(",", $row['dislikes']);
+        $disliked = false;
+        foreach($dislikes as $dislike){
+            if($dislike == $_SESSION['id']){
+                $disliked = true;
+            }
+        }
+        if($disliked){
+            //Do nothing
+        }
+        else{
+            $liked = false;
+            foreach($likes as $like){
+                if($like == $_SESSION['id']){
+                    $liked = true;
+                }
+            }
+            if($liked){
+                //IF only one like remove the user id from likes and set likes to empty else remove the user id from likes
+                if(count($likes) == 1){
+                    $likes = array_diff($likes, array($_SESSION['id']));
+                    $likes =  "";
+                }
+                else{
+                    $likes = array_diff($likes, array($_SESSION['id']));
+                    $likes = implode(",", $likes);
+                }
+
+
+                if($row['dislikes'] == ""){
+                    $dislikes = $_SESSION['id'];
+                }
+                else{
+                    $dislikes = $row['dislikes'] . "," . $_SESSION['id'];
+                }
+                $sql = "UPDATE articles SET likes = '$likes', dislikes = '$dislikes' WHERE article_id = '$articleId'";
+                $result = mysqli_query($mysqli, $sql);
+                if(!$result){
+                    echo "Error: ".mysqli_error($mysqli);
+                }
+            }
+            else{
+                if($row['dislikes'] == ""){
+                    $dislikes = $_SESSION['id'];
+                }
+                else{
+                    $dislikes = $row['dislikes'] . "," . $_SESSION['id'];
+                }
+                $sql = "UPDATE articles SET dislikes = '$dislikes' WHERE article_id = '$articleId'";
+                $result = mysqli_query($mysqli, $sql);
+                if(!$result){
+                    echo "Error: ".mysqli_error($mysqli);
+                }
+            }
+        }
+        unset($_POST['dislike']);
+
+        //Repost back to article.php with article_id
+        echo '<form method="POST" action="article.php" id="redirect">
+                <input hidden type="text" name="id" id="id" value="'.$articleId.'">
+                <script>
+                    document.getElementById("redirect").submit();
+                </script>
+            </form>';
+    }
+
+    //Like review
+    //If the user has already liked the review do nothing
+    //If the user has disliked the review remove their id from dislikes and add it to likes
+    //Else add their id to likes (IF likes is empty add their id to likes otherwise add a comma and their id to likes)
+    if(isset($_POST['reviewLike'])){
+        $articleId = $_POST['id'];
+        $reviewId = $_POST['reviewId'];
+        $sql = "SELECT * FROM reviews WHERE review_id = '$reviewId'";
+        $result = mysqli_query($mysqli, $sql);
+        $row = mysqli_fetch_assoc($result);
+        $likes = explode(",", $row['likes']);
+        $dislikes = explode(",", $row['dislikes']);
+        $liked = false;
+        foreach($likes as $like){
+            if($like == $_SESSION['id']){
+                $liked = true;
+            }
+        }
+        if($liked){
+            //Do nothing
+        }
+        else{
+            $disliked = false;
+            foreach($dislikes as $dislike){
+                if($dislike == $_SESSION['id']){
+                    $disliked = true;
+                }
+            }
+            if($disliked){
+                //If there is only one dislike remove the user id from dislikes and set dislikes to empty else remove the user id from dislikes
+                if(count($dislikes) == 1){
+                    $dislikes = array_diff($dislikes, array($_SESSION['id']));
+                    $dislikes =  "";
+                }
+                else{
+                    $dislikes = array_diff($dislikes, array($_SESSION['id']));
+                    $dislikes = implode(",", $dislikes);
+                }
+
+                if($row['likes'] == ""){
+                    $likes = $_SESSION['id'];
+                }
+                else{
+                    $likes = $row['likes'] . "," . $_SESSION['id'];
+                }
+                $sql = "UPDATE reviews SET likes = '$likes', dislikes = '$dislikes' WHERE review_id = '$reviewId'";
+                $result = mysqli_query($mysqli, $sql);
+                if(!$result){
+                    echo "Error: ".mysqli_error($mysqli);
+                }
+            }
+            else{
+                if($row['likes'] == ""){
+                    $likes = $_SESSION['id'];
+                }
+                else{
+                    $likes = $row['likes'] . "," . $_SESSION['id'];
+                }
+                $sql = "UPDATE reviews SET likes = '$likes' WHERE review_id = '$reviewId'";
+                $result = mysqli_query($mysqli, $sql);
+                if(!$result){
+                    echo "Error: ".mysqli_error($mysqli);
+                }
+            }
+        }
+        unset($_POST['reviewLike']);
+
+        //Repost back to article.php with article_id
+        echo '<form method="POST" action="article.php" id="redirect">
+                <input hidden type="text" name="id" id="id" value="'.$articleId.'">
+                <script>
+                    document.getElementById("redirect").submit();
+                </script>
+            </form>';
+    }
+
+
+    //Dislike review
+    //If the user has already disliked the review do nothing
+    //If the user has liked the review remove their id from likes and add it to dislikes
+    //Else add their id to dislikes (IF dislikes is empty add their id to dislikes otherwise add a comma and their id to dislikes)
+    if(isset($_POST['reviewDislike'])){
+        $articleId = $_POST['id'];
+        $reviewId = $_POST['reviewId'];
+        $sql = "SELECT * FROM reviews WHERE review_id = '$reviewId'";
+        $result = mysqli_query($mysqli, $sql);
+        $row = mysqli_fetch_assoc($result);
+        $likes = explode(",", $row['likes']);
+        $dislikes = explode(",", $row['dislikes']);
+        $disliked = false;
+        foreach($dislikes as $dislike){
+            if($dislike == $_SESSION['id']){
+                $disliked = true;
+            }
+        }
+        if($disliked){
+            //Do nothing
+        }
+        else{
+            $liked = false;
+            foreach($likes as $like){
+                if($like == $_SESSION['id']){
+                    $liked = true;
+                }
+            }
+            if($liked){
+                //IF only one like remove the user id from likes and set likes to empty else remove the user id from likes
+                if(count($likes) == 1){
+                    $likes = array_diff($likes, array($_SESSION['id']));
+                    $likes =  "";
+                }
+                else{
+                    $likes = array_diff($likes, array($_SESSION['id']));
+                    $likes = implode(",", $likes);
+                }
+                if($row['dislikes'] == ""){
+                    $dislikes = $_SESSION['id'];
+                }
+                else{
+                    $dislikes = $row['dislikes'] . "," . $_SESSION['id'];
+                }
+                $sql = "UPDATE reviews SET likes = '$likes', dislikes = '$dislikes' WHERE review_id = '$reviewId'";
+                $result = mysqli_query($mysqli, $sql);
+                if(!$result){
+                    echo "Error: ".mysqli_error($mysqli);
+                }
+            }
+            else{
+                if($row['dislikes'] == ""){
+                    $dislikes = $_SESSION['id'];
+                }
+                else{
+                    $dislikes = $row['dislikes'] . "," . $_SESSION['id'];
+                }
+                $sql = "UPDATE reviews SET dislikes = '$dislikes' WHERE review_id = '$reviewId'";
+                $result = mysqli_query($mysqli, $sql);
+                if(!$result){
+                    echo "Error: ".mysqli_error($mysqli);
+                }
+            }
+        }
+        unset($_POST['reviewDislike']);
+
+        //Repost back to article.php with article_id
+        echo '<form method="POST" action="article.php" id="redirect">
+                <input hidden type="text" name="id" id="id" value="'.$articleId.'">
+                <script>
+                    document.getElementById("redirect").submit();
+                </script>
+            </form>';
     }
 ?>

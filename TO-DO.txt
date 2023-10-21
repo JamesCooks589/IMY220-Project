@@ -23,9 +23,11 @@ Sure, here's a condensed plan for 8 days, with more work scheduled on the weeken
 - Search bar (Articles by name, date, or summary).
 - Add "Read" functionality to articles and the profile page.
 - Message functionality.
+- Article not centered
 
 **Day 6: October 22nd (Weekend)**
 - Implement random profile images.
+- Add profile picture sign up
 - Revamp error messages.
 - Labels for all form inputs.
 

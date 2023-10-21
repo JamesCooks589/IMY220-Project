@@ -240,6 +240,7 @@
                 $_SESSION["surname"] = $row["surname"];
                 $_SESSION["profilePicture"] = $row["profilePicture"];
                 $_SESSION["prefrence"] = $row["prefrence"];
+                $_SESSION["state"] = "global";
 
 
                 echo '<script>window.location = "home.php";</script>';
@@ -296,6 +297,7 @@
                         $_SESSION["surname"] = $lastName;
                         $_SESSION["profilePicture"] = "images/profilePictures/default.png";
                         $_SESSION["prefrence"] = "dark";
+                        $_SESSION["state"] = "global";
                         echo '<script>window.location = "home.php";</script>';
                     }
                     else{

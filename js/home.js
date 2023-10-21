@@ -32,4 +32,48 @@ $(document).ready(function () {
         $("body").append(form);
         form.submit();
     });
+
+    $("#local").on("click", function () {
+        //Create form and post variable state to local
+        const form = $("<form>")
+            .attr("method", "post")
+            .attr("action", "home.php")
+            .append($("<input>")
+                .attr("type", "hidden")
+                .attr("name", "state")
+                .val("local"));
+
+        $("body").append(form);
+        form.submit();
+    }
+    );
+
+    $("#global").on("click", function () {
+        //Create form and post variable state to global
+        const form = $("<form>")
+            .attr("method", "post")
+            .attr("action", "home.php")
+            .append($("<input>")
+                .attr("type", "hidden")
+                .attr("name", "state")
+                .val("global"));
+
+        $("body").append(form);
+        form.submit();
+    }
+    );
+
+    $(".user").on("click", function () {
+        const userID = $(this).find(".id").text();
+        const form = $("<form>")
+            .attr("method", "post")
+            .attr("action", "profile.php")
+            .append($("<input>")
+                .attr("type", "hidden")
+                .attr("name", "userID")
+                .val(userID));
+
+        $("body").append(form);
+        form.submit();
+    });
 });

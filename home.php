@@ -1,6 +1,10 @@
 <?php 
     session_start();
     include("db_connection.php");
+    If(isset($_POST['state'])){
+      $_SESSION['state'] = $_POST['state'];
+    }
+    $state = $_SESSION['state'];
 ?>
 
 <!DOCTYPE html>
@@ -29,12 +33,32 @@
 </head>
 <body>
   <!-- Banner with and Profile Picture -->
-  <img src="images/starry_night.png" alt="Banner" class="img-fluid">
+    <img src="images/starry_night.png" alt="Banner" class="img-fluid">
+  <!-- Search bar -->
+  <div class="container">
+    <div class="row">
+      <div class="col-md-8 offset-md-2">
+        <form method="POST" action="">
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Search" aria-label="Search" aria-describedby="search" name="search">
+            <button class="btn btn-primary" type="submit" id="search" name="searchButton"><i class="lni lni-search-alt"></i></button>
+          </div>
+        </form>
+      </div>
+    </div>
   <nav>
   <div id="feeds">
-
-        <button class="btn btn-primary inactive" id="local">Local</button>
-        <button class="btn btn-primary active" id="global">Global</button>
+        <?php
+          if($state == "global"){
+            echo "<button class='btn btn-primary inactive' id='local'>Local</button>";
+            echo "<button class='btn btn-primary active' id='global'>Global</button>";
+          }
+          else{
+            echo "<button class='btn btn-primary active' id='local'>Local</button>";
+            echo "<button class='btn btn-primary inactive' id='global'>Global</button>";
+          }
+        ?>
+            
     </div>
     
     <div id="profilePicture">
@@ -53,41 +77,100 @@
           <!-- articles -->
             <?php 
             //Get all articles in reverse chronological order
-              $fetchQuery = "SELECT * FROM `articles` ORDER BY `date` DESC";
-              $result = $mysqli->query($fetchQuery);
-              if($result->num_rows > 0){
-                while($row = $result->fetch_assoc()){
-                  //Explode and all caps hashtags
-                  $hashtags = explode(",", $row["hashtags"]);
-                  $hashtags = array_map('strtoupper', $hashtags);
-                  echo "<div class='card mb-3 article'>";
-                    echo "<div class='row g-0'>";
-                    echo "<div class='col-md-4'>";
-                    echo "<img src='".$row["artPieceImage"]."' alt='No Image' class='img-fluid'>";
+              if($state == "global"){
+                $fetchQuery = "SELECT * FROM `articles` ORDER BY `date` DESC";
+                $result = $mysqli->query($fetchQuery);
+                if($result->num_rows > 0){
+                  //Seek to first row
+                  $result->data_seek(0);
+                  while($row = $result->fetch_assoc()){
+                    //Explode and all caps hashtags
+                    $hashtags = explode(",", $row["hashtags"]);
+                    $hashtags = array_map('strtoupper', $hashtags);
+                    echo "<div class='card mb-3 article'>";
+                      echo "<div class='row g-0'>";
+                      echo "<div class='col-md-4'>";
+                      echo "<img src='".$row["artPieceImage"]."' alt='No Image' class='img-fluid'>";
+                      echo "</div>";
+                      echo "<div class='col-md-8'>";
+                      echo "<div class='card-body'>";
+                      echo "<div class='category'>";
+                      echo "<span class='badge bg-primary'>".$row["category"]."</span>";
+                      echo "</div>";
+                      echo "<h5 class='card-title title'>".$row["title"]."</h5>";
+                      echo "<h6 class='card-subtitle mb-2 '>".$row["author"]."</h6>";
+                      echo "<h6 class='card-subtitle mb-2 '>".$row["date"]."</h6>";
+                      //Hidden element for id
+                      echo "<p class='card-text id' hidden>".$row["article_id"]."</p>";
+                      
+                      echo "<p class='card-text'>".$row["summary"]."</p>";
+                      echo "<div class='hashtags'>";
+                      foreach($hashtags as $hashtag){
+                        echo "<span class='badge hashtag'>".$hashtag."</span>";
+                      }
+                      echo "</div>";
+                      echo "</div>";
+                      echo "</div>";
+                      echo "</div>";
                     echo "</div>";
-                    echo "<div class='col-md-8'>";
-                    echo "<div class='card-body'>";
-                    echo "<div class='category'>";
-                    echo "<span class='badge bg-primary'>".$row["category"]."</span>";
-                    echo "</div>";
-                    echo "<h5 class='card-title title'>".$row["title"]."</h5>";
-                    echo "<h6 class='card-subtitle mb-2 '>".$row["author"]."</h6>";
-                    echo "<h6 class='card-subtitle mb-2 '>".$row["date"]."</h6>";
-                    //Hidden element for id
-                    echo "<p class='card-text id' hidden>".$row["article_id"]."</p>";
-                    
-                    echo "<p class='card-text'>".$row["summary"]."</p>";
-                    echo "<div class='hashtags'>";
-                    foreach($hashtags as $hashtag){
-                      echo "<span class='badge hashtag'>".$hashtag."</span>";
-                    }
-                    echo "</div>";
-                    echo "</div>";
-                    echo "</div>";
-                    echo "</div>";
-                  echo "</div>";
+                  }
+                }
+                else{
+                  echo "<h1>No articles found</h1>";
                 }
               }
+              else{
+                //Show all articles made by all users that the user follows
+                $userID = $_SESSION["id"];
+                //Create an array of all users that the user follows
+                $fetchFollowing = "SELECT `following` FROM users where `id` = $_SESSION[id]";
+                $result = $mysqli->query($fetchFollowing);
+                $following = $result->fetch_assoc();
+                $following = explode(",", $following["following"]);
+                //Get all articles made by users that the user follows
+                foreach($following as $followedUser){
+                  $fetchQuery = "SELECT * FROM `articles` WHERE `user_id` = $followedUser ORDER BY `date` DESC";
+                  $result = $mysqli->query($fetchQuery);
+                  if($result->num_rows > 0){
+                    //Seek to first row
+                    $result->data_seek(0);
+                    while($row = $result->fetch_assoc()){
+                      //Explode and all caps hashtags
+                      $hashtags = explode(",", $row["hashtags"]);
+                      $hashtags = array_map('strtoupper', $hashtags);
+                      echo "<div class='card mb-3 article'>";
+                        echo "<div class='row g-0'>";
+                        echo "<div class='col-md-4'>";
+                        echo "<img src='".$row["artPieceImage"]."' alt='No Image' class='img-fluid'>";
+                        echo "</div>";
+                        echo "<div class='col-md-8'>";
+                        echo "<div class='card-body'>";
+                        echo "<div class='category'>";
+                        echo "<span class='badge bg-primary'>".$row["category"]."</span>";
+                        echo "</div>";
+                        echo "<h5 class='card-title title'>".$row["title"]."</h5>";
+                        echo "<h6 class='card-subtitle mb-2 '>".$row["author"]."</h6>";
+                        echo "<h6 class='card-subtitle mb-2 '>".$row["date"]."</h6>";
+                        //Hidden element for id
+                        echo "<p class='card-text id' hidden>".$row["article_id"]."</p>";
+                        
+                        echo "<p class='card-text'>".$row["summary"]."</p>";
+                        echo "<div class='hashtags'>";
+                        foreach($hashtags as $hashtag){
+                          echo "<span class='badge hashtag'>".$hashtag."</span>";
+                        }
+                        echo "</div>";
+                        echo "</div>";
+                        echo "</div>";
+                        echo "</div>";
+                      echo "</div>";
+                    }
+                  }
+                  else{
+                    echo "<h1>No articles found</h1>";
+                  }
+                }
+              }             
             
             ?>
         </div>
@@ -270,6 +353,97 @@
 
         echo "<script src='js/home.js'></script>";
   ?>
+
+  <!--Search bar functionality-->
+  <!--Search for articles by title, date, summary, artist, art piece title, hashtags, category-->
+  <?php
+    if(isset($_POST["searchButton"])){
+      //Clear articles div
+      echo "<script>$('#articles').empty()</script>";
+      //Get search term
+      $search = $_POST["search"];
+      $search = $mysqli->real_escape_string($search);
+      $query = "SELECT * FROM `articles` WHERE `title` LIKE '%$search%' OR `date` LIKE '%$search%' OR `summary` LIKE '%$search%' OR `artist`  LIKE '%$search%' OR `artPieceTitle` LIKE '%$search%' OR `hashtags` LIKE '%$search%' OR `category` LIKE '%$search%' OR `author` LIKE '%$search%' ORDER BY `date` DESC";
+      $result = $mysqli->query($query);
+      if($result->num_rows > 0){
+        //Seek to first row
+        $result->data_seek(0);
+        echo "<h1>Search results for '$search'</h1>";
+        while($row = $result->fetch_assoc()){
+          //Explode and all caps hashtags
+          $hashtags = explode(",", $row["hashtags"]);
+          $hashtags = array_map('strtoupper', $hashtags);
+          echo "<div class='card mb-3 article'>";
+            echo "<div class='row g-0'>";
+            echo "<div class='col-md-4'>";
+            echo "<img src='".$row["artPieceImage"]."' alt='No Image' class='img-fluid'>";
+            echo "</div>";
+            echo "<div class='col-md-8'>";
+            echo "<div class='card-body'>";
+            echo "<div class='category'>";
+            echo "<span class='badge bg-primary'>".$row["category"]."</span>";
+            echo "</div>";
+            echo "<h5 class='card-title title'>".$row["title"]."</h5>";
+            echo "<h6 class='card-subtitle mb-2 '>".$row["author"]."</h6>";
+            echo "<h6 class='card-subtitle mb-2 '>".$row["date"]."</h6>";
+            //Hidden element for id
+            echo "<p class='card-text id' hidden>".$row["article_id"]."</p>";
+            
+            echo "<p class='card-text'>".$row["summary"]."</p>";
+            echo "<div class='hashtags'>";
+            foreach($hashtags as $hashtag){
+              echo "<span class='badge hashtag'>".$hashtag."</span>";
+            }
+            echo "</div>";
+            echo "</div>";
+            echo "</div>";
+            echo "</div>";
+          echo "</div>";
+        }
+      }
+      else{
+        echo "<h1>No articles found</h1>";
+      }
+    }
+
+    //Search for users by username, name or email
+    if(isset($_POST["searchButton"])){
+      //Clear articles div
+      echo "<script>$('#articles').empty()</script>";
+      //Get search term
+      $search = $_POST["search"];
+      $search = $mysqli->real_escape_string($search);
+      $query = "SELECT * FROM `users` WHERE `username` LIKE '%$search%' OR `name` LIKE '%$search%' OR `email` LIKE '%$search%'";
+      $result = $mysqli->query($query);
+      if($result->num_rows > 0){
+        //Seek to first row
+        $result->data_seek(0);
+        echo "<h1>Search results for '$search'</h1>";
+        while($row = $result->fetch_assoc()){
+          echo "<div class='card mb-3 user'>";
+            echo "<div class='row g-0'>";
+            echo "<div class='col-md-4'>";
+            echo "<img src='".$row["profilePicture"]."' alt='No Image' class='img-fluid'>";
+            echo "</div>";
+            echo "<div class='col-md-8'>";
+            echo "<div class='card-body'>";
+            echo "<h5 class='card-title title'>".$row["username"]."</h5>";
+            echo "<h6 class='card-subtitle mb-2 '>".$row["name"]."</h6>";
+            echo "<h6 class='card-subtitle mb-2 '>".$row["email"]."</h6>";
+            //Hidden element for id
+            echo "<p class='card-text id' hidden id='SearchUserId'>".$row["id"]."</p>";
+            echo "</div>";
+            echo "</div>";
+            echo "</div>";
+        }
+      }
+      else{
+        echo "<h1>No users found</h1>";
+      }
+    }
+  ?>
+
+
 
   <!-- Include Bootstrap JavaScript -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
