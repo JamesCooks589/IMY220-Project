@@ -50,11 +50,11 @@
   <div id="feeds">
         <?php
           if($state == "global"){
-            echo "<button class='btn btn-primary inactive' id='local'>Local</button>";
+            echo "<button class='btn btn-primary inactive' id='local'>Following</button>";
             echo "<button class='btn btn-primary active' id='global'>Global</button>";
           }
           else{
-            echo "<button class='btn btn-primary active' id='local'>Local</button>";
+            echo "<button class='btn btn-primary active' id='local'>Following</button>";
             echo "<button class='btn btn-primary inactive' id='global'>Global</button>";
           }
         ?>
@@ -368,7 +368,7 @@
       if($result->num_rows > 0){
         //Seek to first row
         $result->data_seek(0);
-        echo "<h1>Search results for '$search'</h1>";
+        echo "<h1>Articles containing '$search'</h1>";
         while($row = $result->fetch_assoc()){
           //Explode and all caps hashtags
           $hashtags = explode(",", $row["hashtags"]);
@@ -418,7 +418,7 @@
       if($result->num_rows > 0){
         //Seek to first row
         $result->data_seek(0);
-        echo "<h1>Search results for '$search'</h1>";
+        echo "<h1>Users containing '$search'</h1>";
         while($row = $result->fetch_assoc()){
           echo "<div class='card mb-3 user'>";
             echo "<div class='row g-0'>";

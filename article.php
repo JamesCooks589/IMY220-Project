@@ -58,6 +58,8 @@
         
         <head>
         <body>
+            <p id="sentID" hidden>'.$article_id.'</p>
+            <p id="sentUserID" hidden>'.$_SESSION['id'].'</p>
             <div class="fluid-container">
                 <div class="row">
                     <div class="logo col-md-2">
@@ -949,4 +951,39 @@
                 </script>
             </form>';
     }
+
+    //Read article
+    if (isset($_POST['read'])) {
+        $article_id = $_POST['id'];
+    
+        $sql = "SELECT * FROM users WHERE id = '$_SESSION[id]'";
+        $result = mysqli_query($mysqli, $sql);
+        $row = mysqli_fetch_assoc($result);
+        $readArticles = $row['readArticles'];
+    
+        // Convert the comma-separated string to an array
+        $readArticlesArray = explode(",", $readArticles);
+    
+        if (!in_array($article_id, $readArticlesArray)) {
+            // Add the article ID to the array
+            $readArticlesArray[] = $article_id;
+    
+            // Filter out empty elements and convert the array back to a comma-separated string
+            $readArticles = implode(",", array_filter($readArticlesArray));
+    
+            // Update readArticles in the database
+            $sql = "UPDATE users SET readArticles = '$readArticles' WHERE id = '$_SESSION[id]'";
+            $result = mysqli_query($mysqli, $sql);
+            if (!$result) {
+                echo "Error: " . mysqli_error($mysqli);
+            }
+        }
+    
+        unset($_POST['read']);
+    }
+    
+    
+    
+
+        
 ?>

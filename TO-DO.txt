@@ -1,29 +1,29 @@
 Sure, here's a condensed plan for 8 days, with more work scheduled on the weekend, and the final days dedicated to message and friend functionality, testing, and project setup:
 
 **Day 1: October 17th**
-- Remove hashing from passwords.
-- Remove "create new list" from the article page.
-- Input validation for forms.
+$ Remove hashing from passwords.
+$ Remove "create new list" from the article page.
+$ Input validation for forms.
 
 **Day 2: October 18th**
-- Only one place to connect to the database.
-- Scroll effect on the splash page.
-- Show a list of friends.
+$ Only one place to connect to the database.
+$ Scroll effect on the splash page.
+$ Show a list of friends.
 
 **Day 3: October 19th**
-- Log out functionality.
+$ Log out functionality.
 
 **Day 4: October 20th (Weekend)**
-- Local and Global activity feeds.
-- Likes and dislikes.
-- Search bar (Return links, Users by name, username, or email).
-- Friends
+$ Local and Global activity feeds.
+$ Likes and dislikes.
+$ Search bar (Return links, Users by name, username, or email).
+$ Friends
 
 **Day 5: October 21st (Weekend)**
-- Search bar (Articles by name, date, or summary).
-- Add "Read" functionality to articles and the profile page.
+$ Search bar (Articles by name, date, or summary).
+$ Add "Read" functionality to articles and the profile page.
 - Message functionality.
-- Article not centered
+$ Article not centered
 
 **Day 6: October 22nd (Weekend)**
 - Implement random profile images.
@@ -31,7 +31,7 @@ Sure, here's a condensed plan for 8 days, with more work scheduled on the weeken
 - Revamp error messages.
 - Labels for all form inputs.
 
-**Day 7: October 25th**
+**Day 7: October 23**
 - Admin functionality and its sub-tasks:
    - Manage all activity.
    - Manage articles.
@@ -39,7 +39,7 @@ Sure, here's a condensed plan for 8 days, with more work scheduled on the weeken
    - Add new categories.
 -Add that cool logo thing on splash page
 
-**Day 8: October 26th**
+**Day 8: October 24**
 - Longer Tasks and optional feature:
    - Delete a profile and all associated articles.
    - In lists, check if all articles still exist.

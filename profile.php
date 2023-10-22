@@ -152,10 +152,9 @@
                     // If the user is the owner of the profile, display toggle buttons between lists and articles
                     if ($userID == $_SESSION['id'] || in_array($_SESSION['id'], $followingArray)) {
                         echo '<div class="toggle">';
-                        echo '<button class="btn btn-primary active" id="articles">Articles</button>';
+                        echo '    <button class="btn btn-primary active" id="articles">Articles</button>';
                         echo '<button class="btn btn-primary inactive" id="lists">Lists</button>';
-                        echo '<button class="btn btn-primary inactive" id="followers">Followers</button>';
-                        echo '<button class="btn btn-primary inactive" id="following">Following</button>';
+                        echo '<button class="btn btn-primary inactive" id="friends">Friends</button>';
                         echo '</div>';
                     }
                 ?>
@@ -163,46 +162,96 @@
                 <div class="bigArticles" style="display:block">
                     <div class="articles">
                      <h2>Articles by <?php echo $row['username']; ?></h2>
-                        <?php
-                        // Loop through articles and display them
-                        if (mysqli_num_rows($result2) > 0) {
-                            while ($row2 = mysqli_fetch_assoc($result2)) {
-                                // Explode and convert hashtags to uppercase
-                                $hashtags = explode(",", $row2["hashtags"]);
-                                $hashtags = array_map('strtoupper', $hashtags);
-                        ?>
-                        <div class='card mb-3 article'>
-                            <div class='row g-0'>
-                                <div class='col-md-4'>
-                                    <img src='<?php echo $row2["artPieceImage"]; ?>' alt='No Image' class='img-fluid'>
-                                </div>
-                                <div class='col-md-8'>
-                                    <div class='card-body'>
-                                        <div class='category'>
-                                            <span class='badge bg-primary'><?php echo $row2["category"]; ?></span>
-                                        </div>
-                                        <h5 class='card-title title'><?php echo $row2["title"]; ?></h5>
-                                        <h6 class='card-subtitle mb-2 '><?php echo $row2["author"]; ?></h6>
-                                        <h6 class='card-subtitle mb-2 '><?php echo $row2["date"]; ?></h6>
-                                        <p class='card-text id' hidden><?php echo $row2["article_id"]; ?></p>
-                                        <p class='card-text'><?php echo $row2["summary"]; ?></p>
-                                        <div class='hashtags'>
-                                            <?php
-                                            foreach ($hashtags as $hashtag) {
-                                                echo "<span class='badge hashtag'>$hashtag</span>";
-                                            }
-                                            ?>
+                       <div class="button-group">
+                        <button class="btn btn-primary active" id="createdArticles">Created</button>
+                        <button class="btn btn-primary inactive" id="readArticles">Read</button>
+                       </div>
+                       <div class="createdArticles" style="display:block">
+                            <?php
+                            // Loop through articles and display them
+                            if (mysqli_num_rows($result2) > 0) {
+                                while ($row2 = mysqli_fetch_assoc($result2)) {
+                                    // Explode and convert hashtags to uppercase
+                                    $hashtags = explode(",", $row2["hashtags"]);
+                                    $hashtags = array_map('strtoupper', $hashtags);
+                            ?>
+                            <div class='card mb-3 article'>
+                                <div class='row g-0'>
+                                    <div class='col-md-4'>
+                                        <img src='<?php echo $row2["artPieceImage"]; ?>' alt='No Image' class='img-fluid'>
+                                    </div>
+                                    <div class='col-md-8'>
+                                        <div class='card-body'>
+                                            <div class='category'>
+                                                <span class='badge bg-primary'><?php echo $row2["category"]; ?></span>
+                                            </div>
+                                            <h5 class='card-title title'><?php echo $row2["title"]; ?></h5>
+                                            <h6 class='card-subtitle mb-2 '><?php echo $row2["author"]; ?></h6>
+                                            <h6 class='card-subtitle mb-2 '><?php echo $row2["date"]; ?></h6>
+                                            <p class='card-text id' hidden><?php echo $row2["article_id"]; ?></p>
+                                            <p class='card-text'><?php echo $row2["summary"]; ?></p>
+                                            <div class='hashtags'>
+                                                <?php
+                                                foreach ($hashtags as $hashtag) {
+                                                    echo "<span class='badge hashtag'>$hashtag</span>";
+                                                }
+                                                ?>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <?php
+                            <?php
+                                }
+                            } else {
+                                echo '<p>No articles yet!</p>';
                             }
-                        } else {
-                            echo '<p>No articles yet!</p>';
-                        }
-                        ?>
+                            ?>
+                        </div>
+                        <div class="readArticles" style="display:none">
+                            <?php
+                                //User's read articles (readArticles is a string of article ids separated by commas)
+                                $readArticles = $row['readArticles'];
+                                if($readArticles != ''){
+                                    $readArticlesArray = explode(',', $readArticles);
+                                    foreach($readArticlesArray as $readArticleID){
+                                        $sqlRead = "SELECT * FROM articles WHERE article_id = '$readArticleID'";
+                                        $resultRead = mysqli_query($mysqli, $sqlRead);
+                                        $rowRead = mysqli_fetch_assoc($resultRead);
+                                        // Explode and convert hashtags to uppercase
+                                        $hashtags = explode(",", $rowRead["hashtags"]);
+                                        $hashtags = array_map('strtoupper', $hashtags);
+
+                                        echo '<div class="card mb-3 article">';
+                                        echo '<div class="row g-0">';
+                                        echo '<div class="col-md-4">';
+                                        echo '<img src="' . $rowRead["artPieceImage"] . '" alt="No Image" class="img-fluid">';
+                                        echo '</div>';
+                                        echo '<div class="col-md-8">';
+                                        echo '<div class="card-body">';
+                                        echo '<div class="category">';
+                                        echo '<span class="badge bg-primary">' . $rowRead["category"] . '</span>';
+                                        echo '</div>';
+                                        echo '<h5 class="card-title title">' . $rowRead["title"] . '</h5>';
+                                        echo '<h6 class="card-subtitle mb-2 ">' . $rowRead["author"] . '</h6>';
+                                        echo '<h6 class="card-subtitle mb-2 ">' . $rowRead["date"] . '</h6>';
+                                        echo '<p class="card-text id" hidden>' . $rowRead["article_id"] . '</p>';
+                                        echo '<p class="card-text">' . $rowRead["summary"] . '</p>';
+                                        echo '<div class="hashtags">';
+                                        foreach ($hashtags as $hashtag) {
+                                            echo "<span class='badge hashtag'>$hashtag</span>";
+                                        }
+                                        echo '</div>';
+                                        echo '</div>';
+                                        echo '</div>';
+                                        echo '</div>';
+                                        echo '</div>';
+                                    }
+                                }else{
+                                    echo '<p>No read articles yet!</p>';
+                                }
+                            ?>
+                        </div>
                     </div>
                 </div>
 
@@ -255,69 +304,75 @@
                 </div>
 
                 <!--Followers-->
-                <div class="followers" style="display:none">
-                    <?php
-                    // Loop through followers and display them
-                    if ($row['followers'] != '') {
-                        echo '<h2>Followers</h2>';
-                        $followers = $row['followers'];
-                        $followersArray = explode(',', $followers);
-                        foreach ($followersArray as $followerID) {
-                            $sql = "SELECT * FROM users WHERE id = '$followerID'";
-                            $result = mysqli_query($mysqli, $sql);
-                            $row = mysqli_fetch_assoc($result);
-                            // A card for each follower showing the username and profile picture
-                            echo '<div class="card mb-3 follower">';
-                            echo '<div class="row g-0">';
-                            echo '<div class="col-md-4">';
-                            echo '<div class="card-header">';
-                            echo '<h5 class="card-title title">' . $row['username'] . '</h5>';
-                            echo '</div>';
-                            echo '<div class="card-body">';
-                            echo '<img src="' . $row['profilePicture'] . '" alt="Profile Picture" class="img-fluid">';
-                            echo '</div>';
-                            echo '</div>';
-                            
-                            echo '</div>';
-                            echo '</div>';
+                <div class="friends" style="display:none">
+                    <div class="button-group">
+                        <button class="btn btn-primary active" id="followers">Followers</button>
+                        <button class="btn btn-primary inactive" id="following">Following</button>
+                    </div>
+                    <div class="followers" style="display:none">
+                        <?php
+                        // Loop through followers and display them
+                        if ($row['followers'] != '') {
+                            echo '<h2>Followers</h2>';
+                            $followers = $row['followers'];
+                            $followersArray = explode(',', $followers);
+                            foreach ($followersArray as $followerID) {
+                                $sql = "SELECT * FROM users WHERE id = '$followerID'";
+                                $result = mysqli_query($mysqli, $sql);
+                                $row = mysqli_fetch_assoc($result);
+                                // A card for each follower showing the username and profile picture
+                                echo '<div class="card mb-3 follower">';
+                                echo '<div class="row g-0">';
+                                echo '<div class="col-md-4">';
+                                echo '<div class="card-header">';
+                                echo '<h5 class="card-title title">' . $row['username'] . '</h5>';
+                                echo '</div>';
+                                echo '<div class="card-body">';
+                                echo '<img src="' . $row['profilePicture'] . '" alt="Profile Picture" class="img-fluid">';
+                                echo '</div>';
+                                echo '</div>';
+                                
+                                echo '</div>';
+                                echo '</div>';
+                            }
+                        } else {
+                            echo '<p>No followers yet!</p>';
                         }
-                    } else {
-                        echo '<p>No followers yet!</p>';
-                    }
-                    ?>
-                </div>
-                
-                <!--Following-->
-                <div class="following" style="display:none">
-                    <?php
-                    // Loop through following and display them
-                    if ($row['following'] != '') {
-                        echo '<h2>Following</h2>';
-                        $following = $row['following'];
-                        $followingArray = explode(',', $following);
-                        foreach ($followingArray as $followingID) {
-                            $sql = "SELECT * FROM users WHERE id = '$followingID'";
-                            $result = mysqli_query($mysqli, $sql);
-                            $row = mysqli_fetch_assoc($result);
-                            // A card for each following showing the username and profile picture
-                            echo '<div class="card mb-3 following">';
-                            echo '<div class="row g-0">';
-                            echo '<div class="col-md-4">';
-                            echo '<div class="card-header">';
-                            echo '<h5 class="card-title title">' . $row['username'] . '</h5>';
-                            echo '</div>';
-                            echo '<div class="card-body">';
-                            echo '<img src="' . $row['profilePicture'] . '" alt="Profile Picture" class="img-fluid">';
-                            echo '</div>';
-                            echo '</div>';
-                            
-                            echo '</div>';
-                            echo '</div>';
+                        ?>
+                    </div>
+                    
+                    <!--Following-->
+                    <div class="following" style="display:none">
+                        <?php
+                        // Loop through following and display them
+                        if ($row['following'] != '') {
+                            echo '<h2>Following</h2>';
+                            $following = $row['following'];
+                            $followingArray = explode(',', $following);
+                            foreach ($followingArray as $followingID) {
+                                $sql = "SELECT * FROM users WHERE id = '$followingID'";
+                                $result = mysqli_query($mysqli, $sql);
+                                $row = mysqli_fetch_assoc($result);
+                                // A card for each following showing the username and profile picture
+                                echo '<div class="card mb-3 following">';
+                                echo '<div class="row g-0">';
+                                echo '<div class="col-md-4">';
+                                echo '<div class="card-header">';
+                                echo '<h5 class="card-title title">' . $row['username'] . '</h5>';
+                                echo '</div>';
+                                echo '<div class="card-body">';
+                                echo '<img src="' . $row['profilePicture'] . '" alt="Profile Picture" class="img-fluid">';
+                                echo '</div>';
+                                echo '</div>';
+                                
+                                echo '</div>';
+                                echo '</div>';
+                            }
+                        } else {
+                            echo '<p>Not following anyone yet!</p>';
                         }
-                    } else {
-                        echo '<p>Not following anyone yet!</p>';
-                    }
-                    ?>
+                        ?>
+                    </div>
                 </div>
             </div>
         </div>
