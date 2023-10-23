@@ -7,6 +7,7 @@
     include 'db_connection.php';
 
     $userID = $_POST['userID'];
+    echo '<script>console.log("userID: ' . $userID . '")</script>';
 
 
     //All sql queries for sections on profile page
@@ -51,7 +52,7 @@
     <body>
         <img src="images/starry_night.png" alt="Banner" class="img-fluid">
         <div id = "logoContainer">
-            <a href="home.php"><img src="images/logo/dark1.png" alt="Whole Artedly Logo" class="img-fluid logo"></a>
+            <a href="home.php"><img src="images/logo/logo_dark.png" alt="Whole Artedly Logo" class="img-fluid logo"></a>
         <?php if($_SESSION['id'] == $userID){ 
                 echo '<h1>Hello ' . $_SESSION['username'] . '!</h1>';
             }else{
@@ -77,10 +78,18 @@
                 }
             }
 
-
+            function showError($message) {
+                echo '<script type="text/javascript">';
+                echo 'document.getElementById("errorDiv").style.display = "block";';
+                echo 'document.getElementById("errorMessage").innerText = "' . $message . '";';
+                echo '</script>';
+            }            
         ?>
         </div>
         <div class="container">
+        <div id="errorDiv" class="alert alert-danger" style="display:none;">
+            <p id="errorMessage"></p>
+        </div>
             <div class="row">
                 <!--2 columns-->
                 <!-- Left column for profile info-->
@@ -150,7 +159,7 @@
                     $following = $row['following'];
                     $followingArray = explode(',', $following);
                     // If the user is the owner of the profile, display toggle buttons between lists and articles
-                    if ($userID == $_SESSION['id'] || in_array($_SESSION['id'], $followingArray)) {
+                    if ($userID == $_SESSION['id'] || in_array($_SESSION['id'], $followersArray) || in_array($_SESSION['id'], $followingArray)) {
                         echo '<div class="toggle">';
                         echo '    <button class="btn btn-primary active" id="articles">Articles</button>';
                         echo '<button class="btn btn-primary inactive" id="lists">Lists</button>';
@@ -344,24 +353,27 @@
                     <!--Following-->
                     <div class="following" style="display:none">
                         <?php
+                        $sqlFollowing = "SELECT * FROM users WHERE id = '$userID'";
+                        $resultFollowing = mysqli_query($mysqli, $sqlFollowing);
+                        $rowFollowing = mysqli_fetch_assoc($resultFollowing);
                         // Loop through following and display them
-                        if ($row['following'] != '') {
+                        if ($rowFollowing['following'] != '') {
                             echo '<h2>Following</h2>';
-                            $following = $row['following'];
+                            $following = $rowFollowing['following'];
                             $followingArray = explode(',', $following);
                             foreach ($followingArray as $followingID) {
                                 $sql = "SELECT * FROM users WHERE id = '$followingID'";
                                 $result = mysqli_query($mysqli, $sql);
-                                $row = mysqli_fetch_assoc($result);
+                                $rowFollowing = mysqli_fetch_assoc($result);
                                 // A card for each following showing the username and profile picture
                                 echo '<div class="card mb-3 following">';
                                 echo '<div class="row g-0">';
                                 echo '<div class="col-md-4">';
                                 echo '<div class="card-header">';
-                                echo '<h5 class="card-title title">' . $row['username'] . '</h5>';
+                                echo '<h5 class="card-title title">' . $rowFollowing['username'] . '</h5>';
                                 echo '</div>';
                                 echo '<div class="card-body">';
-                                echo '<img src="' . $row['profilePicture'] . '" alt="Profile Picture" class="img-fluid">';
+                                echo '<img src="' . $rowFollowing['profilePicture'] . '" alt="Profile Picture" class="img-fluid">';
                                 echo '</div>';
                                 echo '</div>';
                                 
@@ -399,10 +411,8 @@
         $profilePicture = $_FILES['profilePicture']['name'];
 
         //Check if all fields are filled in
-        if($name == '' || $surname == '' || $dateOfBirth == '' || $email == '' || $username == '' || $password == ''){
-            echo '<script type="text/javascript">';
-            echo 'alert("Please fill in all fields");';
-            echo '</script>';
+        if ($name == '' || $surname == '' || $dateOfBirth == '' || $email == '' || $username == '' || $password == '') {
+            showError("Please fill in all fields");
             exit();
         }
 
@@ -410,12 +420,10 @@
         $sql = "SELECT * FROM users WHERE email = '$email'";
         $result = mysqli_query($mysqli, $sql);
         $row = mysqli_fetch_assoc($result);
-        if(mysqli_num_rows($result) > 0 && $row['id'] != $userID){
-            echo '<script type="text/javascript">';
-            echo 'alert("Email already exists");';
-            echo '</script>';
+        if (mysqli_num_rows($result) > 0 && $row['id'] != $userID) {
+            showError("Email already exists");
             exit();
-        }
+}
 
         //Sanitize inputs
         $name = mysqli_real_escape_string($mysqli, $name);
@@ -457,17 +465,13 @@
             //sanitize inputs
             $listName = $_POST['listName'];
             //If input is empty, show error message
-            if($listName == ''){
-                echo '<script type="text/javascript">';
-                echo 'alert("Please enter a list name");';
-                echo '</script>';
+            if ($listName == '') {
+                showError("Please enter a list name");
                 exit();
             }
             $description = $_POST['description'];
-            if($description == ''){
-                echo '<script type="text/javascript">';
-                echo 'alert("Please enter a description");';
-                echo '</script>';
+            if ($description == '') {
+                showError("Please enter a description");
                 exit();
             }
             $userID = $_POST['userID'];

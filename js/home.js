@@ -1,6 +1,20 @@
 $(document).ready(function () {
+    //Hashtag search
+    //When user clicks on a hashtag, get the hashtag and enter it into the search bar and click the search button
+    $(".hashtag").on("click", function () {
+        const hashtag = $(this).text();
+        $(".searchBar").val(hashtag);
+        $("#search").click();
+    }
+    );
+
     // When a user clicks on an article, get the article id (in a hidden paragraph) and send it to the article.php page as a post request
     $(".article").on("click", function () {
+        //If user clicks on hashtag area of the article, do nothing
+        if ($(event.target).hasClass("hashtag")) {
+            return;
+        }
+        
         const articleId = $(this).find(".id").text();
 
         // Create a form dynamically and submit it with the POST data
@@ -64,7 +78,7 @@ $(document).ready(function () {
     );
 
     $(".user").on("click", function () {
-        const userID = $(this).find(".id").text();
+        const userID = $(this).find("#searchID").val();
         const form = $("<form>")
             .attr("method", "post")
             .attr("action", "profile.php")

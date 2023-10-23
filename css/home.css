@@ -112,6 +112,7 @@
     .hashtags {
         display: flex;
         justify-content: flex-end;
+        cursor: pointer;
     }
     .hashtag {
         background-color: rgb(181, 181, 7);
@@ -124,3 +125,7 @@
     span {
         float: right;
     }
+
+.user{
+    background-color: #2f424f;
+}

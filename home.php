@@ -40,7 +40,7 @@
       <div class="col-md-8 offset-md-2">
         <form method="POST" action="">
           <div class="input-group mb-3">
-            <input type="text" class="form-control" placeholder="Search" aria-label="Search" aria-describedby="search" name="search">
+            <input type="text" class="form-control searchBar" placeholder="Search" aria-label="Search" aria-describedby="search" name="search">
             <button class="btn btn-primary" type="submit" id="search" name="searchButton"><i class="lni lni-search-alt"></i></button>
           </div>
         </form>
@@ -71,6 +71,17 @@
 
   <!-- Articles -->
   <div class="container">
+    <div id="errorDiv" class="alert alert-danger" style="display:none;">
+      <p id="errorMessage"></p>
+    </div>
+    <?php
+      function showError($message) {
+        echo '<script type="text/javascript">';
+        echo 'document.getElementById("errorDiv").style.display = "block";';
+        echo 'document.getElementById("errorMessage").innerText = "' . $message . '";';
+        echo '</script>';
+      }
+    ?>
     <div class="row">
       <div class="col-md-8 offset-md-2">
         <div id="articles">
@@ -222,18 +233,18 @@
                     <div class="mb-3">
                         <label for="categorySelect" class="form-label">Category</label>
                         <select class="form-select" id="categorySelect" name="categorySelect" required>
-                        <option value="" disabled selected>Select a category</option>
-                          <option value="Visual Art">Visual Art</option>
-                          <option value="Sculpture">Sculpture</option>
-                          <option value="Music">Music</option>
-                          <option value="Literature">Literature</option>
-                          <option value="Performing Art">Performing Art</option>
-                          <option value="Theatre">Theatre</option>
-                          <option value="Film">Film</option>
-                          <option value="Architecture">Architecture</option>
-                          <option value="Fashion">Fashion</option>
-                          <option value="Photography">Photography</option>
-                          <option value="Digital Art">Digital Art</option>
+                          <option selected disabled value="">Choose a category</option>
+                          <?php
+                            $query = "SELECT * FROM `categories`";
+                            $result = $mysqli->query($query);
+                            if($result->num_rows > 0){
+                              //Seek to first row
+                              $result->data_seek(0);
+                              while($row = $result->fetch_assoc()){
+                                echo "<option value='".$row["name"]."'>".$row["name"]."</option>";
+                              }
+                            }
+                          ?>
                         </select>
                     </div>
                     <!--Image upload-->
@@ -271,8 +282,8 @@
 
           //Check all fields are filled
           if($title == "" || $summary == "" || $body == "" || $artist == "" || $artPieceTitle == "" || $hashtags == "" || $category == ""){
-            echo "<script>alert('Please fill in all fields')</script>";
-            return;
+            showError("Please fill in all fields");
+            exit();
           }
           var_dump($_FILES);
           //Image upload
@@ -288,25 +299,25 @@
               echo "File is an image - " . $check["mime"] . ".";
               $uploadOk = 1;
             } else {
-              echo "<script>alert('File is not an image.')</script>";
+              showError("File is not an image.");
               $uploadOk = 0;
             }
 
             // Check file size
             if ($_FILES["artPieceImage"]["size"] > 500000) {
-              echo "<script>alert('Sorry, your file is too large.')</script>";
+              showError("Sorry, your file is too large.");
               $uploadOk = 0;
             }
 
             // Allow certain file formats
             if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg") {
-              echo "<script>alert('Sorry, only JPG, JPEG, PNG & GIF files are allowed.')</script>";
+              showError("Sorry, only JPG, JPEG, PNG & GIF files are allowed.");
               $uploadOk = 0;
             }
 
             // Check if $uploadOk is set to 0 by an error
             if ($uploadOk == 0) {
-              echo "<script>alert('Sorry, your file was not uploaded.')</script>";
+              showError("Sorry, your file was not uploaded.");
             // if everything is ok, try to upload file
             } else {
               //Hash file name
@@ -314,15 +325,15 @@
               $target_file = $target_dir . $hash . "." . $imageFileType;
               $filename = $hash . "." . $imageFileType;
               if (move_uploaded_file($_FILES["artPieceImage"]["tmp_name"], $target_file)) {
-                echo "<script>alert('The file ". htmlspecialchars( basename( $_FILES["artPieceImage"]["name"])). " has been uploaded.')</script>";
+                echo "The file ". htmlspecialchars( basename( $_FILES["artPieceImage"]["name"])). " has been uploaded.";
                 $artPieceImage = $target_file;
               } else {
-                echo "<script>alert('Sorry, there was an error uploading your file.')</script>";
+                  showError("Sorry, there was an error uploading your file.");
               }
             }
           }
           else{
-            echo "<script>alert('Please upload an image')</script>";
+            showError("Please upload an image");
           }
 
           //Error checking and sanitization
@@ -341,7 +352,8 @@
 
           //If error occurs in query, alert error
           if($mysqli->error){
-            echo "<script>alert(".$mysqli->error.")</script>";
+            showError("Error creating article");
+            exit();
           }
           
           //Stop page from resubmitting form
@@ -431,7 +443,7 @@
             echo "<h6 class='card-subtitle mb-2 '>".$row["name"]."</h6>";
             echo "<h6 class='card-subtitle mb-2 '>".$row["email"]."</h6>";
             //Hidden element for id
-            echo "<p class='card-text id' hidden id='SearchUserId'>".$row["id"]."</p>";
+            echo "<input type='hidden' class='card-text' name='userID' id='searchID' value='".$row["id"]."'>";
             echo "</div>";
             echo "</div>";
             echo "</div>";
@@ -442,6 +454,73 @@
       }
     }
   ?>
+
+  <?php
+    //Admin account
+    if($_SESSION["id"] == 1){
+      //allow admin to add categories
+      echo "<form method='POST' action=''>";
+      echo "<div class='mb-3'>";
+      echo "<label for='categoryName' class='form-label'>Category Name</label>";
+      echo "<input type='text' class='form-control' id='categoryName' name='categoryName' required>";
+      echo "</div>";
+      echo "<button type='submit' class='btn btn-primary' name='addCategory'>Add Category</button>";
+      echo "</form>";
+
+      //Add category function
+      if(isset($_POST["addCategory"])){
+        $categoryName = $_POST["categoryName"];
+        $categoryName = $mysqli->real_escape_string($categoryName);
+        $query = "INSERT INTO `categories`(`name`) VALUES ('$categoryName')";
+        $mysqli->query($query);
+        //If error occurs in query, alert error
+        if($mysqli->error){
+          showError("Error adding category");
+          exit();
+        }
+        //Stop page from resubmitting form
+        echo "<script>window.location.href = 'home.php'</script>";
+        unset($_POST["addCategory"]);
+      }
+
+      //allow admin to delete categories
+      echo "<form method='POST' action=''>";
+      echo "<div class='mb-3'>";
+      echo "<label for='categoryName' class='form-label'>Category Name</label>";
+      echo "<select class='form-select' id='categorySelect' name='categorySelect' required>";
+      echo "<option selected disabled value=''>Choose a category</option>";
+      $query = "SELECT * FROM `categories`";
+      $result = $mysqli->query($query);
+      if($result->num_rows > 0){
+        //Seek to first row
+        $result->data_seek(0);
+        while($row = $result->fetch_assoc()){
+          echo "<option value='".$row["name"]."'>".$row["name"]."</option>";
+        }
+      }
+      echo "</select>";
+      echo "</div>";
+      echo "<button type='submit' class='btn btn-primary' name='deleteCategory'>Delete Category</button>";
+      echo "</form>";
+
+      //Delete category function
+      if(isset($_POST["deleteCategory"])){
+        $categoryName = $_POST["categorySelect"];
+        $categoryName = $mysqli->real_escape_string($categoryName);
+        $query = "DELETE FROM `categories` WHERE `name` = '$categoryName'";
+        $mysqli->query($query);
+        //If error occurs in query, alert error
+        if($mysqli->error){
+          showError("Error deleting category");
+          exit();
+        }
+        //Stop page from resubmitting form
+        echo "<script>window.location.href = 'home.php'</script>";
+        unset($_POST["deleteCategory"]);
+      }
+    }
+  ?>
+
 
 
 

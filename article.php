@@ -32,6 +32,13 @@
         }
     }
 
+    function showError($message) {
+        echo '<script type="text/javascript">';
+        echo 'document.getElementById("errorDiv").style.display = "block";';
+        echo 'document.getElementById("errorMessage").innerText = "' . $message . '";';
+        echo '</script>';
+    }
+
     //Make html page
     echo '
         <!DOCTYPE html>
@@ -61,9 +68,12 @@
             <p id="sentID" hidden>'.$article_id.'</p>
             <p id="sentUserID" hidden>'.$_SESSION['id'].'</p>
             <div class="fluid-container">
+                <div id="errorDiv" class="alert alert-danger" style="display:none;">
+                    <p id="errorMessage"></p>
+                </div>
                 <div class="row">
                     <div class="logo col-md-2">
-                        <a href="home.php"><img src="images/logo/dark1.png" alt="Whole Artedly Logo"></a>
+                        <a href="home.php"><img src="images/logo/logo_dark.png" alt="Whole Artedly Logo"></a>
                     </div>
                     <div class="col-md-8" id="article">
                         <figure>
@@ -376,7 +386,7 @@
         $review = $_POST['review'];
         $articleId = $_POST['id'];
         if($review == ""){
-            echo "<script>alert('Please write a review.')</script>";
+            showError("Please write a review");
         }
         $date = date("Y-m-d");
         $intArticleId = (int)$article_id;
@@ -392,25 +402,25 @@
                 echo "File is an image - " . $check["mime"] . ".";
                 $uploadOk = 1;
             } else {
-                echo "<script>alert('File is not an image.')</script>";
+                showError("File is not an image.");
                 $uploadOk = 0;
             }
 
             //Check size
             if($_FILES['reviewImage']['size'] > 2000000){
-                echo "<script>alert('File is too large.')</script>";
+                showError("File is too large");
                 $uploadOk = 0;
             }
 
             //Only allow jpg, png and jpeg
             if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"){
-                echo "<script>alert('Only JPG, JPEG and PNG files are allowed.')</script>";
+                showError("Only JPG, JPEG, PNG files are allowed");
                 $uploadOk = 0;
             }
 
             //Check if uploadOK is set to 0 by an error
             if($uploadOk == 0){
-                echo "<script>alert('File was not uploaded.')</script>";
+                showError("File was not uploaded");
 
                 //Repost back to article.php with article_id
                     echo '<form method="POST" action="article.php" id="redirect">
@@ -537,7 +547,7 @@
 
         //Check if all fields are filled
         if($title == "" || $hashtags == "" || $category == "" || $body == "" || $artPieceTitle == "" || $artist == ""){
-            echo "<script>alert('Please fill in all fields.')</script>";
+            showError("Please fill in all fields");
         }
 
         //If there is an image upload the  name of the image otherwise set it to empty

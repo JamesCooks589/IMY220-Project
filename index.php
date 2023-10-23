@@ -28,6 +28,18 @@
     <link rel="stylesheet" type="text/css" href="css/splash.css">
 </head>
 <body>
+    <div id="errorDiv" class="alert alert-danger" style="display:none;">
+        <p id="errorMessage"></p>
+    </div>
+    <?php
+        function showError($message) {
+            echo '<script type="text/javascript">';
+            echo 'document.getElementById("errorDiv").style.display = "block";';
+            echo 'document.getElementById("errorMessage").innerText = "' . $message . '";';
+            echo '</script>';
+        }
+    ?>
+
     <div id="beforeFold">
         <div id="topRight">
             <button id="login" data-toggle="modal" data-target="#signInModal">Login</button>
@@ -171,7 +183,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form method="POST" action="index.php">
+                <form method="POST" action="index.php" enctype="multipart/form-data">
                     <div class="form-group">
                         <label for="signUpUsername">Username</label>
                         <input type="text" class="form-control" id="signUpUsername" name="signUpUsername" placeholder="Enter your username">
@@ -202,6 +214,8 @@
                         <label for="signUpConfirmPassword">Confirm Password</label>
                         <input type="password" class="form-control" id="signUpConfirmPassword" name="signUpConfirmPassword" placeholder="Confirm your password">
                     </div>
+                    <label for="signUpProfileImage">Profile Image</label>
+                    <input type="file" class="form-control-file" id="signUpProfileImage" name="signUpProfileImage">
                     <button name="signUp" type="submit" class="btn btn-primary btn-block">Sign Up</button>
                 </form>
             </div>
@@ -246,7 +260,7 @@
                 echo '<script>window.location = "home.php";</script>';
             }
             else{
-                echo "<script>alert('Incorrect email or password')</script>";
+                showError("Incorrect email or password");
             }
         }
         else{
@@ -265,6 +279,37 @@
             $pass = $_POST["signUpPassword"];
             $confirmPass = $_POST["signUpConfirmPassword"];
 
+            // Profile picture upload
+            $targetDirectory = "images/profilePictures/";
+            //Random number between 1 and 5
+            $randomNumber = rand(1, 5);
+            $defaultProfileImage = "images/profilePictures/default" . $randomNumber . ".png";
+        
+            if ($_FILES["signUpProfileImage"]["name"] != "") {
+                $imageFileName = $_FILES["signUpProfileImage"]["name"];
+                $targetPath = $targetDirectory . $imageFileName;
+                
+                // Check if the uploaded file is an image
+                $imageFileType = strtolower(pathinfo($targetPath, PATHINFO_EXTENSION));
+                $allowedExtensions = array("jpg", "jpeg", "png");
+        
+                if (in_array($imageFileType, $allowedExtensions)) {
+                    if (move_uploaded_file($_FILES["signUpProfileImage"]["tmp_name"], $targetPath)) {
+                        // Image upload successful
+                        $profilePicture = $targetPath;
+                    } else {
+                        showError("Error uploading image");
+                        $profilePicture = $defaultProfileImage; // Use default image on upload failure
+                    }
+                } else {
+                    showError("Invalid image format");
+                    $profilePicture = $defaultProfileImage; // Use default image on invalid format
+                }
+            } else {
+                // Use default image if no image is uploaded
+                $profilePicture = $defaultProfileImage;
+            }
+
             //Sanatize input
             $username = mysqli_real_escape_string($mysqli, $username);
             $email = mysqli_real_escape_string($mysqli, $email);
@@ -281,12 +326,12 @@
                 $res = mysqli_query($mysqli, $query);
 
                 if(mysqli_num_rows($res) > 0){
-                    echo "<script>alert('Email already exists')</script>";
+                    showError("Email already exists");
                 }
                 else{
 
                     //Insert into database
-                    $query = "INSERT INTO `users`(`name`, `surname`, `email`, `username`, `password`, `profilePicture`, `prefrence`, `dateOfBirth`) VALUES ('$firstName', '$lastName', '$email', '$username', '$pass', 'images/profilePictures/default.png', 'dark', '$dob')";
+                    $query = "INSERT INTO `users`(`name`, `surname`, `email`, `username`, `password`, `profilePicture`, `prefrence`, `dateOfBirth`) VALUES ('$firstName', '$lastName', '$email', '$username', '$pass', '$profilePicture', 'dark', '$dob')";
                     $res = mysqli_query($mysqli, $query);
 
                     if($res){
@@ -295,36 +340,26 @@
                         $_SESSION["username"] = $username;
                         $_SESSION["name"] = $firstName;
                         $_SESSION["surname"] = $lastName;
-                        $_SESSION["profilePicture"] = "images/profilePictures/default.png";
+                        $_SESSION["profilePicture"] = $profilePicture;
                         $_SESSION["prefrence"] = "dark";
                         $_SESSION["state"] = "global";
                         echo '<script>window.location = "home.php";</script>';
                     }
                     else{
-                        echo "<script>alert('Error creating account')</script>";
+                        showError("Error creating account");
                     }
                 }
             }
             else{
-                echo "<script>alert('Passwords do not match')</script>";
+                showError("Passwords do not match");
             }
         }
         else{
-            echo "<script>alert('Please fill in all fields')</script>";
+            showError("Please fill in all fields");
         }
     }
-?>
-
-
-
-
-
-
-
-
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
-
+?>   
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
     <!-- Include Bootstrap JS scripts -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>

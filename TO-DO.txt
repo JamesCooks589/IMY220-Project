@@ -22,27 +22,30 @@ $ Friends
 **Day 5: October 21st (Weekend)**
 $ Search bar (Articles by name, date, or summary).
 $ Add "Read" functionality to articles and the profile page.
-- Message functionality.
 $ Article not centered
 
 **Day 6: October 22nd (Weekend)**
-- Implement random profile images.
-- Add profile picture sign up
-- Revamp error messages.
-- Labels for all form inputs.
+$ Implement random profile images.
+$ Add profile picture sign up
+$ Revamp error messages.
+# Labels for all form inputs. //CHECK WHEN DONE !!!!!!!!!!!!!!
 
 **Day 7: October 23**
+- Message functionality.
 - Admin functionality and its sub-tasks:
    - Manage all activity.
    - Manage articles.
    - Manage accounts.
    - Add new categories.
--Add that cool logo thing on splash page
 
 **Day 8: October 24**
 - Longer Tasks and optional feature:
    - Delete a profile and all associated articles.
    - In lists, check if all articles still exist.
 - Proper testing and setting up the project for demoing.
+
+**Day 9: October 25**
+- CSS overhall
+-Read spec top to bottom and make sure everything is done
 
 This plan provides more intensive work over the weekend when you might have more time and energy to dedicate to the project. It also ensures that you allocate the 25th for the more time-consuming tasks of message functionality and friend requests, followed by testing and project setup on the 26th.
