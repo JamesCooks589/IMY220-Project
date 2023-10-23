@@ -32,7 +32,7 @@ $ Revamp error messages.
 
 **Day 7: October 23**
 - Message functionality.
-- Admin functionality and its sub-tasks:
+$ Admin functionality and its sub-tasks:
    - Manage all activity.
    - Manage articles.
    - Manage accounts.
@@ -47,5 +47,6 @@ $ Revamp error messages.
 **Day 9: October 25**
 - CSS overhall
 -Read spec top to bottom and make sure everything is done
+-Check bonus section under ADMIN
 
 This plan provides more intensive work over the weekend when you might have more time and energy to dedicate to the project. It also ensures that you allocate the 25th for the more time-consuming tasks of message functionality and friend requests, followed by testing and project setup on the 26th.

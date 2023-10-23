@@ -75,6 +75,21 @@
                     echo '<input type="hidden" name="userID" value="' . $userID . '">';
                     echo '<button type="submit" class="btn btn-danger" name="unfollow">Unfollow</button>';
                     echo '</form>';
+
+                    $myFollowersSQL = "SELECT * FROM users WHERE id = '" . $_SESSION['id'] . "'";
+                    $myFollowersResult = mysqli_query($mysqli, $myFollowersSQL);
+                    $myFollowersRow = mysqli_fetch_assoc($myFollowersResult);
+                    if($myFollowersRow['followers'] != ''){
+                        $myFollowers = $myFollowersRow['followers'];
+                        $myFollowersArray = explode(',', $myFollowers);
+                    }else{
+                        $myFollowersArray = array();
+                    }
+                    //If the user follows the owner of the profile and the owner of the profile follows the user, show message button
+                    if(in_array($_SESSION['id'], $followersArray) && in_array($userID, $myFollowersArray)){
+                        echo '<a href="messages.php?user1=' . $_SESSION['id'] . '&user2=' . $userID . '" class="btn btn-primary">Message</a>';
+                    }
+
                 }
             }
 
@@ -101,7 +116,7 @@
                         echo '<p>Username: ' . $row['username'] . '</p>';
                         echo '<p>Email: ' . $row['email'] . '</p>';
 
-                        if ($userID == $_SESSION['id']) {
+                        if ($userID == $_SESSION['id'] || $_SESSION['id'] == 1) {
                             echo '<p>First Name: ' . $row['name'] . '</p>';
                             echo '<p>Last Name: ' . $row['surname'] . '</p>';
                             echo '<p>Date of Birth: ' . $row['dateOfBirth'] . '</p>';
