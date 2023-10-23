@@ -78,7 +78,8 @@
       function showError($message) {
         echo '<script type="text/javascript">';
         echo 'document.getElementById("errorDiv").style.display = "block";';
-        echo 'document.getElementById("errorMessage").innerText = "' . $message . '";';
+        //Append error messages to div
+        echo 'document.getElementById("errorMessage").innerHTML += "'.$message.'";';
         echo '</script>';
       }
     ?>
@@ -139,46 +140,51 @@
                 $following = $result->fetch_assoc();
                 $following = explode(",", $following["following"]);
                 //Get all articles made by users that the user follows
-                foreach($following as $followedUser){
-                  $fetchQuery = "SELECT * FROM `articles` WHERE `user_id` = $followedUser ORDER BY `date` DESC";
-                  $result = $mysqli->query($fetchQuery);
-                  if($result->num_rows > 0){
-                    //Seek to first row
-                    $result->data_seek(0);
-                    while($row = $result->fetch_assoc()){
-                      //Explode and all caps hashtags
-                      $hashtags = explode(",", $row["hashtags"]);
-                      $hashtags = array_map('strtoupper', $hashtags);
-                      echo "<div class='card mb-3 article'>";
-                        echo "<div class='row g-0'>";
-                        echo "<div class='col-md-4'>";
-                        echo "<img src='".$row["artPieceImage"]."' alt='No Image' class='img-fluid'>";
+                if($following[0] == ""){
+                  echo "<h1>Follow users to see their articles</h1>";
+                }
+                else{
+                  foreach($following as $followedUser){
+                    $fetchQuery = "SELECT * FROM `articles` WHERE `user_id` = $followedUser ORDER BY `date` DESC";
+                    $result = $mysqli->query($fetchQuery);
+                    if($result->num_rows > 0){
+                      //Seek to first row
+                      $result->data_seek(0);
+                      while($row = $result->fetch_assoc()){
+                        //Explode and all caps hashtags
+                        $hashtags = explode(",", $row["hashtags"]);
+                        $hashtags = array_map('strtoupper', $hashtags);
+                        echo "<div class='card mb-3 article'>";
+                          echo "<div class='row g-0'>";
+                          echo "<div class='col-md-4'>";
+                          echo "<img src='".$row["artPieceImage"]."' alt='No Image' class='img-fluid' id='articleImage'>";
+                          echo "</div>";
+                          echo "<div class='col-md-8'>";
+                          echo "<div class='card-body'>";
+                          echo "<div class='category'>";
+                          echo "<span class='badge bg-primary'>".$row["category"]."</span>";
+                          echo "</div>";
+                          echo "<h5 class='card-title title'>".$row["title"]."</h5>";
+                          echo "<h6 class='card-subtitle mb-2 '>".$row["author"]."</h6>";
+                          echo "<h6 class='card-subtitle mb-2 '>".$row["date"]."</h6>";
+                          //Hidden element for id
+                          echo "<p class='card-text id' hidden>".$row["article_id"]."</p>";
+                          
+                          echo "<p class='card-text'>".$row["summary"]."</p>";
+                          echo "<div class='hashtags'>";
+                          foreach($hashtags as $hashtag){
+                            echo "<span class='badge hashtag'>".$hashtag."</span>";
+                          }
+                          echo "</div>";
+                          echo "</div>";
+                          echo "</div>";
+                          echo "</div>";
                         echo "</div>";
-                        echo "<div class='col-md-8'>";
-                        echo "<div class='card-body'>";
-                        echo "<div class='category'>";
-                        echo "<span class='badge bg-primary'>".$row["category"]."</span>";
-                        echo "</div>";
-                        echo "<h5 class='card-title title'>".$row["title"]."</h5>";
-                        echo "<h6 class='card-subtitle mb-2 '>".$row["author"]."</h6>";
-                        echo "<h6 class='card-subtitle mb-2 '>".$row["date"]."</h6>";
-                        //Hidden element for id
-                        echo "<p class='card-text id' hidden>".$row["article_id"]."</p>";
-                        
-                        echo "<p class='card-text'>".$row["summary"]."</p>";
-                        echo "<div class='hashtags'>";
-                        foreach($hashtags as $hashtag){
-                          echo "<span class='badge hashtag'>".$hashtag."</span>";
-                        }
-                        echo "</div>";
-                        echo "</div>";
-                        echo "</div>";
-                        echo "</div>";
-                      echo "</div>";
+                      }
                     }
-                  }
-                  else{
-                    echo "<h1>No articles found</h1>";
+                    else{
+                      echo "<h1>No articles found</h1>";
+                    }
                   }
                 }
               }             
@@ -303,8 +309,8 @@
               $uploadOk = 0;
             }
 
-            // Check file size
-            if ($_FILES["artPieceImage"]["size"] > 500000) {
+            // Check file size is less than 5MB
+            if ($_FILES["artPieceImage"]["size"] > 5000000) {
               showError("Sorry, your file is too large.");
               $uploadOk = 0;
             }
@@ -347,6 +353,10 @@
           $category = $mysqli->real_escape_string($category);
           $date = $mysqli->real_escape_string($date);
 
+          if($uploadOk == 0){
+            showError("Error uploading image");
+            exit();
+          }
           $query = "INSERT INTO `articles`(`article_id`, `user_id`, `title`, `author`, `summary`, `body`, `artist`, `artPieceTitle`, `artPieceImage`, `hashtags`, `category`, `date`) VALUES (NULL, '$userID', '$title', '$author', '$summary', '$body', '$artist', '$artPieceTitle', '$artPieceImage', '$hashtags', '$category', '$date')";
           $mysqli->query($query);
 
@@ -458,6 +468,7 @@
   <?php
     //Admin account
     if($_SESSION["id"] == 1){
+      echo '<h1>Admin functionality</h1>';
       //allow admin to add categories
       echo "<form method='POST' action=''>";
       echo "<div class='mb-3'>";

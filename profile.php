@@ -159,7 +159,7 @@
                     $following = $row['following'];
                     $followingArray = explode(',', $following);
                     // If the user is the owner of the profile, display toggle buttons between lists and articles
-                    if ($userID == $_SESSION['id'] || in_array($_SESSION['id'], $followersArray) || in_array($_SESSION['id'], $followingArray)) {
+                    if ($userID == $_SESSION['id'] || in_array($_SESSION['id'], $followersArray) || in_array($_SESSION['id'], $followingArray) || $_SESSION['id'] == 1) {
                         echo '<div class="toggle">';
                         echo '    <button class="btn btn-primary active" id="articles">Articles</button>';
                         echo '<button class="btn btn-primary inactive" id="lists">Lists</button>';

@@ -240,7 +240,7 @@
                                             </div>';
                                             //If the user is the owner of the article or the review allow them to edit or delete the review
                                             if(isset($_SESSION['id'])){
-                                                if($_SESSION['id'] == $articleCreatorId || $_SESSION['id'] == $row['user_id']){
+                                                if($_SESSION['id'] == $articleCreatorId || $_SESSION['id'] == $row['user_id'] || $_SESSION['id'] == 1){
                                                     echo '
                                                     <div class="edit-delete">';
                                                     //Edit button to toggle edit modal and delete button in a form
@@ -300,7 +300,7 @@
                             <br>
                             <div class="edit-delete">';
                             if(isset($_SESSION['id'])){
-                                if($_SESSION['id'] == $articleCreatorId){
+                                if($_SESSION['id'] == $articleCreatorId || $_SESSION['id'] == 1){
                                     //Edit button to toggle edit modal and delete button in a form
                                     echo '
                                         <h6>Edit or Delete Article</h6>
