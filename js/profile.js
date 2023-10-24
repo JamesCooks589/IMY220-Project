@@ -94,6 +94,27 @@ $(document).ready(function () {
         $("#following").removeClass("inactive");
     });
 
-    
+    //List articles click event handler
+    $(".article").click(function () {
+        //If the article has the style of opacity 0.5, then alert the user this article has been deleted
+        if ($(this).css("opacity") == 0.5) {
+            alert("This article has been deleted.");
+        } else {
+            //Otherwise post the article id to the article page
+            var articleId = $(this).find(".id").text();
+
+            // Create a form dynamically and submit it with the POST data
+            var form = $("<form>")
+                .attr("method", "post")
+                .attr("action", "article.php")
+                .append($("<input>")
+                    .attr("type", "hidden")
+                    .attr("name", "id")
+                    .val(articleId));
+
+            $("body").append(form);
+            form.submit();
+        }
+    });
 
 });

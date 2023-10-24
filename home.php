@@ -90,7 +90,7 @@
             <?php 
             //Get all articles in reverse chronological order
               if($state == "global"){
-                $fetchQuery = "SELECT * FROM `articles` ORDER BY `date` DESC";
+                $fetchQuery = "SELECT * FROM `articles` WHERE `deleted` = 0 ORDER BY `date` DESC";
                 $result = $mysqli->query($fetchQuery);
                 if($result->num_rows > 0){
                   //Seek to first row

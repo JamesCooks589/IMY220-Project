@@ -121,8 +121,12 @@
                             echo '<p>Last Name: ' . $row['surname'] . '</p>';
                             echo '<p>Date of Birth: ' . $row['dateOfBirth'] . '</p>';
                             echo '<button class="btn btn-primary" id="editProfile" data-bs-toggle="modal" data-bs-target="#editProfileModal">Edit Profile</button>';
+                            echo '<form action="deleteProfile.php" method="post" id="delete-form">';
+                            echo '<input type="hidden" name="userID" value="' . $userID . '">';
+                            echo '<button type="submit" class="btn btn-danger" id="delete">Delete Profile</button>';
+                            echo '</form>';
                             echo '<form action="logout.php" method="post" id="logout-form">';
-                            echo '<button type="submit" class="btn btn-danger" id="logout">Logout</button>';
+                            echo '<button type="submit" class="btn btn-warning" id="logout">Logout</button>';
                             echo '</form>';
 
                             
@@ -136,7 +140,7 @@
                             echo '</div>';
                             echo '<div class="modal-body">';
                             echo '<form action="" method="POST" enctype="multipart/form-data">';
-                            echo '<input type="hidden" name="userID" value="' . $userID . '">'; //hidden input for userID';
+                            echo '<input type="hidden" name="userID" value="' . $userID . '">';
                             
                             // Function to create form input field with label
                             function createFormInput($id, $label, $type, $name, $value) {
@@ -246,7 +250,11 @@
                                         $hashtags = explode(",", $rowRead["hashtags"]);
                                         $hashtags = array_map('strtoupper', $hashtags);
 
-                                        echo '<div class="card mb-3 article">';
+                                        if($rowRead['deleted'] == 1){
+                                            echo '<div class="card mb-3 article" style="opacity:0.5">';
+                                        }else{
+                                            echo '<div class="card mb-3 article">';
+                                        }
                                         echo '<div class="row g-0">';
                                         echo '<div class="col-md-4">';
                                         echo '<img src="' . $rowRead["artPieceImage"] . '" alt="No Image" class="img-fluid">';
@@ -256,7 +264,13 @@
                                         echo '<div class="category">';
                                         echo '<span class="badge bg-primary">' . $rowRead["category"] . '</span>';
                                         echo '</div>';
-                                        echo '<h5 class="card-title title">' . $rowRead["title"] . '</h5>';
+                                        
+                                        if($rowRead['deleted'] == 1){
+                                            echo '<h5 class="card-title title" style="text-decoration:line-through">' . $rowRead["title"] . '</h5>';
+                                        }else{
+                                            echo '<h5 class="card-title title">' . $rowRead["title"] . '</h5>';
+                                        }
+                                        
                                         echo '<h6 class="card-subtitle mb-2 ">' . $rowRead["author"] . '</h6>';
                                         echo '<h6 class="card-subtitle mb-2 ">' . $rowRead["date"] . '</h6>';
                                         echo '<p class="card-text id" hidden>' . $rowRead["article_id"] . '</p>';
@@ -313,8 +327,47 @@
                             echo '<h5 class="card-title title">' . $row3['listName'] . '</h5>';
                             echo '<p class="card-text">' . $row3['description'] . '</p>';
                             // Articles contain a list of article ids separated by commas
-                            $articles = explode(',', $row3['articles']);
-                            echo '<p class="card-text">' . count($articles) . ' items</p>';
+                            if ($row3['articles'] != '') {
+                                $articles = $row3['articles'];
+                                $articlesArray = explode(',', $articles);
+                                //Display each article if article's deleted field is marked as 1 (deleted) give it an opacity of 0.5
+                                foreach ($articlesArray as $articleID) {
+                                    $sql = "SELECT * FROM articles WHERE article_id = '$articleID'";
+                                    $result = mysqli_query($mysqli, $sql);
+                                    $row = mysqli_fetch_assoc($result);
+                                    if($row['deleted'] == 1){
+                                        echo '<div class="article" style="opacity:0.5">';
+                                    }else{
+                                        echo '<div class="article">';
+                                    }
+                                    echo '<div class="row g-0">';
+                                    echo '<div class="col-md-4">';
+                                    echo '<img src="' . $row['artPieceImage'] . '" alt="No Image" class="img-fluid">';
+                                    echo '</div>';
+                                    echo '<div class="col-md-8">';
+                                    echo '<div class="card-body">';
+                                    echo '<div class="category">';
+                                    echo '<span class="badge bg-primary">' . $row['category'] . '</span>';
+                                    echo '</div>';
+                                    //If deleted, show title with strikethrough
+                                    if($row['deleted'] == 1){
+                                        echo '<h5 class="card-title title" style="text-decoration:line-through">' . $row['title'] . '</h5>';
+                                    }else{
+                                        echo '<h5 class="card-title title">' . $row['title'] . '</h5>';
+                                    }
+                                    echo '<h6 class="card-subtitle mb-2 ">' . $row['author'] . '</h6>';
+                                    echo '<h6 class="card-subtitle mb-2 ">' . $row['date'] . '</h6>';
+                                    echo '<p class="card-text id" hidden>' . $row['article_id'] . '</p>';
+                                    echo '<p class="card-text">' . $row['summary'] . '</p>';
+                                    echo '<p hidden id="articleID">' . $row['article_id'] . '</p>';
+                                    echo '</div>';
+                                    echo '</div>';
+                                    echo '</div>';
+                                    echo '</div>';
+                                }
+                            } else {
+                                echo '<p class="card-text">0 items</p>';
+                            }
                             echo '<p class="card-text id" hidden>' . $row3['list_id'] . '</p>';
                             echo '</div>';
                             echo '</div>';

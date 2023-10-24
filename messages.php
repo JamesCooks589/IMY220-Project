@@ -69,26 +69,31 @@
 
         <!--CSS-->
         <link rel="stylesheet" type="text/css" href="css/style.css">
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-          <a class="navbar-brand" href="#">Messages between <?php echo $username1; ?> and <?php echo $username2; ?></a>
-          <div class="d-flex">
-            <a href="logout.php" class="btn btn-danger">Logout</a>
-          </div>
-        </div>
-      </nav>
+    <!--Navigation-->
+    <!--Logo left to go back to home.php-->
+    <nav>
+        <a href="home.php"><img src="images/logo/logo_dark.png" alt="Logo" class="logo"></a>
+        
+        <form method="POST" action="profile.php">
+            <input type="hidden" name="userID" value="<?php echo $_SESSION['id']; ?>">
+            <img src= <?php echo $_SESSION["profilePicture"]; ?> alt="Profile picture" class="profile-picture" onclick="this.parentNode.submit();">
+        </form>
+    </nav>
+    <p hidden id="user1"><?php echo $user1; ?></p>
+    <p hidden id="user2"><?php echo $user2; ?></p>
     <h1>Your messages with <?php echo $username2; ?></h1>
     <div class="fluid-container">
         <div class="row">
-            <!--Messages-->
-            <div class="col-12 col-md-8 messages">
-                <?php getAndDisplayMessages($user1, $user2, $mysqli); ?>
+            <!-- Messages -->
+            <div class="col-12 col-md-8 messages" id="messages-container">
+                <!-- Messages will be displayed here using JavaScript -->
             </div>
-            <!--Send message-->
+            <!-- Send message -->
             <div class="col-12 col-md-4">
-                <form action="send_message.php" method="post">
+                <form id="message-form">
                     <input type="hidden" name="user1" value="<?php echo $user1; ?>">
                     <input type="hidden" name="user2" value="<?php echo $user2; ?>">
                     <textarea name="message" id="message" cols="30" rows="10" placeholder="Type your message here..."></textarea>
@@ -97,5 +102,7 @@
             </div>
         </div>
     </div>
+    
+    <script src="js\message.js"></script>
 </body>
 </html>

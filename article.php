@@ -4,6 +4,13 @@
     //Receive data sent from home.js
     $article_id = $_POST['id'];
 
+    //If the user is not logged in redirect them to index.php
+    if(!isset($_SESSION['id'])){
+        header("Location: index.php");
+    }
+
+
+
     //Connect to database
     include('db_connection.php');
 
@@ -12,6 +19,14 @@
     $result = mysqli_query($mysqli, $sql);
     $row = mysqli_fetch_assoc($result);
     $articleCreatorId = $row['user_id'];
+
+      //IF this article is marked as deleted alert the user and redirect them to home.php
+        if($row['deleted'] == 1){
+            echo '<script type="text/javascript">';
+            echo 'alert("This article has been deleted");';
+            echo 'window.location.href = "home.php";';
+            echo '</script>';
+        }
 
     //Likes and dislikes are stored in database as a string of user ids seperated by commas
     //Explode string into array
@@ -519,8 +534,8 @@
     //Delete article and redirect to home.php
     if(isset($_POST['delete'])){
         $articleId = $_POST['id'];
-        //Delete article from database
-        $sql = "DELETE FROM articles WHERE article_id = '$articleId'";
+        //Set article deleted column to 1
+        $sql = "UPDATE articles SET deleted = 1 WHERE article_id = '$articleId'";
         $result = mysqli_query($mysqli, $sql);
         if(!$result){
             echo "Error: ".mysqli_error($mysqli);
