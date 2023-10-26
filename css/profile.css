@@ -180,3 +180,25 @@ span {
     text-align: center;
 }
 
+.follower{
+    width: 40%;
+    margin: 10px 1.5%;
+    background-color: #146aa3;
+    box-shadow: 0 0 10px 0 rgba(0,0,0,0.5);
+}
+
+.follower card-body img{
+    width: 20%;
+}
+
+.followingCard{
+    width: 40%;
+    margin: 10px 1.5%;
+    background-color: #146aa3;
+    box-shadow: 0 0 10px 0 rgba(0,0,0,0.5);
+}
+
+.followingCard card-body img{
+    width: 20%;
+    margin: 10px 1.5%;
+}

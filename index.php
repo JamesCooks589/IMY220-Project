@@ -254,7 +254,7 @@
                 $_SESSION["surname"] = $row["surname"];
                 $_SESSION["profilePicture"] = $row["profilePicture"];
                 $_SESSION["prefrence"] = $row["prefrence"];
-                $_SESSION["state"] = "global";
+                $_SESSION["state"] = "local";
 
 
                 echo '<script>window.location = "home.php";</script>';

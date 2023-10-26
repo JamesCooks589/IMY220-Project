@@ -5,6 +5,12 @@
       $_SESSION['state'] = $_POST['state'];
     }
     $state = $_SESSION['state'];
+
+    //If user is not logged in, redirect to login page
+    if(!isset($_SESSION["id"])){
+      header("Location: index.php");
+      exit();
+    }
 ?>
 
 <!DOCTYPE html>
@@ -145,7 +151,7 @@
                 }
                 else{
                   foreach($following as $followedUser){
-                    $fetchQuery = "SELECT * FROM `articles` WHERE `user_id` = $followedUser ORDER BY `date` DESC";
+                    $fetchQuery = "SELECT * FROM `articles` WHERE `user_id` = $followedUser AND `deleted` = 0 ORDER BY `date` DESC";
                     $result = $mysqli->query($fetchQuery);
                     if($result->num_rows > 0){
                       //Seek to first row
@@ -385,7 +391,7 @@
       //Get search term
       $search = $_POST["search"];
       $search = $mysqli->real_escape_string($search);
-      $query = "SELECT * FROM `articles` WHERE `title` LIKE '%$search%' OR `date` LIKE '%$search%' OR `summary` LIKE '%$search%' OR `artist`  LIKE '%$search%' OR `artPieceTitle` LIKE '%$search%' OR `hashtags` LIKE '%$search%' OR `category` LIKE '%$search%' OR `author` LIKE '%$search%' ORDER BY `date` DESC";
+      $query = "SELECT * FROM `articles` WHERE `title` LIKE '%$search%' OR `date` LIKE '%$search%' OR `summary` LIKE '%$search%' OR `artist`  LIKE '%$search%' OR `artPieceTitle` LIKE '%$search%' OR `hashtags` LIKE '%$search%' OR `category` LIKE '%$search%' OR `author` LIKE '%$search%' AND `deleted` = 0 ORDER BY `date` DESC";
       $result = $mysqli->query($query);
       if($result->num_rows > 0){
         //Seek to first row
@@ -457,6 +463,7 @@
             echo "</div>";
             echo "</div>";
             echo "</div>";
+          echo "</div>";
         }
       }
       else{

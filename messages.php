@@ -20,30 +20,6 @@
     $row = mysqli_fetch_assoc($query);
     $username2 = $row['username'];
 
-    function getAndDisplayMessages($user1, $user2, $mysqli){
-        $sql = "SELECT * FROM messages WHERE (user1 = '$user1' AND user2 = '$user2') OR (user1 = '$user2' AND user2 = '$user1') ORDER BY id ASC";
-        $query = mysqli_query($mysqli, $sql);
-        while($row = mysqli_fetch_assoc($query)){
-            $user1 = $row['user1'];
-            $user2 = $row['user2'];
-            $message = $row['message'];
-            $date = $row['date'];
-            $time = $row['time'];
-
-            //Get the username of the user who sent the message
-            $sql2 = "SELECT * FROM users WHERE id = '$user1'";
-            $query2 = mysqli_query($mysqli, $sql2);
-            $row2 = mysqli_fetch_assoc($query2);
-            $username = $row2['username'];
-
-            //Display the message
-            echo "<div class='message'>";
-            echo "<p class='message-content'>$message</p>";
-            echo "<p class='message-info'>$username, $date, $time</p>";
-            echo "</div>";
-        }
-    }
-
     
 
 ?>
@@ -68,14 +44,15 @@
         <link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet">
 
         <!--CSS-->
-        <link rel="stylesheet" type="text/css" href="css/style.css">
+        <link rel="stylesheet" type="text/css" href="css\messages.css">
         <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 </head>
 <body>
+    <p hidden id="usernames"><?php echo $username1; ?>, <?php echo $username2; ?></p>
     <!--Navigation-->
     <!--Logo left to go back to home.php-->
     <nav>
-        <a href="home.php"><img src="images/logo/logo_dark.png" alt="Logo" class="logo"></a>
+        <a href="home.php" id="logo"><img src="images/logo/logo_dark.png" alt="Logo" class="logo"></a>
         
         <form method="POST" action="profile.php">
             <input type="hidden" name="userID" value="<?php echo $_SESSION['id']; ?>">
@@ -84,14 +61,16 @@
     </nav>
     <p hidden id="user1"><?php echo $user1; ?></p>
     <p hidden id="user2"><?php echo $user2; ?></p>
-    <h1>Your messages with <?php echo $username2; ?></h1>
-    <div class="fluid-container">
-        <div class="row">
+    <h1 id="title">Your messages with <?php echo $username2; ?></h1>
+    <div class="main">
+        <div class="row" id="messages-row">
             <!-- Messages -->
             <div class="col-12 col-md-8 messages" id="messages-container">
                 <!-- Messages will be displayed here using JavaScript -->
             </div>
             <!-- Send message -->
+        </div>
+        <div class="row" id="send-message-row">
             <div class="col-12 col-md-4">
                 <form id="message-form">
                     <input type="hidden" name="user1" value="<?php echo $user1; ?>">

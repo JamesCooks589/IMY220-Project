@@ -1,13 +1,19 @@
 <?php  
     session_start();
-    if(!isset($_SESSION['username'])){
-        header('location:login.php');
+    //If user is not logged in, redirect to login page
+    if (!isset($_SESSION['id'])) {
+        header("Location: index.php");
+        exit();
     }
 
     include 'db_connection.php';
 
     $userID = $_POST['userID'];
-    echo '<script>console.log("userID: ' . $userID . '")</script>';
+
+    if($userID == 1 && $_SESSION['id'] != 1){
+        header("Location: home.php");
+        exit();
+    }
 
 
     //All sql queries for sections on profile page
@@ -123,11 +129,12 @@
                             echo '<button class="btn btn-primary" id="editProfile" data-bs-toggle="modal" data-bs-target="#editProfileModal">Edit Profile</button>';
                             echo '<form action="deleteProfile.php" method="post" id="delete-form">';
                             echo '<input type="hidden" name="userID" value="' . $userID . '">';
-                            echo '<button type="submit" class="btn btn-danger" id="delete">Delete Profile</button>';
                             echo '</form>';
                             echo '<form action="logout.php" method="post" id="logout-form">';
                             echo '<button type="submit" class="btn btn-warning" id="logout">Logout</button>';
                             echo '</form>';
+                            echo '<button type="submit" class="btn btn-danger" id="delete">Delete Profile</button>';
+                            
 
                             
                             // Edit Profile Modal
@@ -158,6 +165,7 @@
                             createFormInput('email', 'Email', 'email', 'email', $row['email']);
                             createFormInput('username', 'Username', 'text', 'username', $row['username']);
                             createFormInput('password', 'Password', 'password', 'password', $row['password']);
+                            
 
                             echo '<button type="submit" class="btn btn-primary" name="editProfile">Submit</button>';
                             echo '</form>';
@@ -202,8 +210,11 @@
                                     // Explode and convert hashtags to uppercase
                                     $hashtags = explode(",", $row2["hashtags"]);
                                     $hashtags = array_map('strtoupper', $hashtags);
-                            ?>
-                            <div class='card mb-3 article'>
+                                    if($row2['deleted'] == 1){
+                                        echo '<div class="card mb-3 article" style="opacity:0.5">';
+                                    }else{
+                                        echo '<div class="card mb-3 article">';
+                                    }?>
                                 <div class='row g-0'>
                                     <div class='col-md-4'>
                                         <img src='<?php echo $row2["artPieceImage"]; ?>' alt='No Image' class='img-fluid'>
@@ -213,7 +224,13 @@
                                             <div class='category'>
                                                 <span class='badge bg-primary'><?php echo $row2["category"]; ?></span>
                                             </div>
-                                            <h5 class='card-title title'><?php echo $row2["title"]; ?></h5>
+                                            <?php
+                                            if($row2['deleted'] == 1){
+                                                echo "<h5 class='card-title title' style='text-decoration:line-through'>" . $row2["title"] . "</h5>";
+                                            }else{
+                                                echo "<h5 class='card-title title'>" . $row2["title"] . "</h5>";
+                                            }
+                                            ?>
                                             <h6 class='card-subtitle mb-2 '><?php echo $row2["author"]; ?></h6>
                                             <h6 class='card-subtitle mb-2 '><?php echo $row2["date"]; ?></h6>
                                             <p class='card-text id' hidden><?php echo $row2["article_id"]; ?></p>
@@ -388,10 +405,13 @@
                     </div>
                     <div class="followers" style="display:none">
                         <?php
+                        $sqlFollowers = "SELECT * FROM users WHERE id = '$userID'";
+                        $resultFollowers = mysqli_query($mysqli, $sqlFollowers);
+                        $rowFollowers = mysqli_fetch_assoc($resultFollowers);
                         // Loop through followers and display them
-                        if ($row['followers'] != '') {
+                        if ($rowFollowers['followers'] != '') {
                             echo '<h2>Followers</h2>';
-                            $followers = $row['followers'];
+                            $followers = $rowFollowers['followers'];
                             $followersArray = explode(',', $followers);
                             foreach ($followersArray as $followerID) {
                                 $sql = "SELECT * FROM users WHERE id = '$followerID'";
@@ -399,17 +419,12 @@
                                 $row = mysqli_fetch_assoc($result);
                                 // A card for each follower showing the username and profile picture
                                 echo '<div class="card mb-3 follower">';
-                                echo '<div class="row g-0">';
-                                echo '<div class="col-md-4">';
                                 echo '<div class="card-header">';
                                 echo '<h5 class="card-title title">' . $row['username'] . '</h5>';
                                 echo '</div>';
                                 echo '<div class="card-body">';
                                 echo '<img src="' . $row['profilePicture'] . '" alt="Profile Picture" class="img-fluid">';
-                                echo '</div>';
-                                echo '</div>';
-                                
-                                echo '</div>';
+                                echo '</div>'; 
                                 echo '</div>';
                             }
                         } else {
@@ -434,17 +449,12 @@
                                 $result = mysqli_query($mysqli, $sql);
                                 $rowFollowing = mysqli_fetch_assoc($result);
                                 // A card for each following showing the username and profile picture
-                                echo '<div class="card mb-3 following">';
-                                echo '<div class="row g-0">';
-                                echo '<div class="col-md-4">';
+                                echo '<div class="card mb-3 followingCard">';
                                 echo '<div class="card-header">';
                                 echo '<h5 class="card-title title">' . $rowFollowing['username'] . '</h5>';
                                 echo '</div>';
                                 echo '<div class="card-body">';
                                 echo '<img src="' . $rowFollowing['profilePicture'] . '" alt="Profile Picture" class="img-fluid">';
-                                echo '</div>';
-                                echo '</div>';
-                                
                                 echo '</div>';
                                 echo '</div>';
                             }
@@ -491,7 +501,7 @@
         if (mysqli_num_rows($result) > 0 && $row['id'] != $userID) {
             showError("Email already exists");
             exit();
-}
+        }
 
         //Sanitize inputs
         $name = mysqli_real_escape_string($mysqli, $name);
@@ -504,10 +514,11 @@
 
         //If the user has uploaded a new profile picture
         if($profilePicture != ''){
-            $target = "images/profilePictures/" . basename($profilePicture);
+            $target = "images/profilePictures/" . basename($_FILES['profilePicture']['name']);
             $sql = "UPDATE users SET profilePicture = '$target' WHERE id = '$userID'";
             mysqli_query($mysqli, $sql);
             move_uploaded_file($_FILES['profilePicture']['tmp_name'], $target);
+            $_SESSION['profilePicture'] = $target;
         }
 
         $sql = "UPDATE users SET name = '$name', surname = '$surname', dateOfBirth = '$dateOfBirth', email = '$email', username = '$username', password = '$password' WHERE id = '$userID'";

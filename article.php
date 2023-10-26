@@ -61,6 +61,7 @@
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <link rel="icon" type="image/x-icon" href="images/favicon.ico">
             <title>'.$row['title'].'</title>
             <!-- Include Bootstrap CSS -->
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
@@ -80,6 +81,8 @@
         
         <head>
         <body>
+            <div class="progress-bar" id="myBar"></div>
+
             <p id="sentID" hidden>'.$article_id.'</p>
             <p id="sentUserID" hidden>'.$_SESSION['id'].'</p>
             <div class="fluid-container">
@@ -88,7 +91,7 @@
                 </div>
                 <div class="row">
                     <div class="logo col-md-2">
-                        <a href="home.php"><img src="images/logo/logo_dark.png" alt="Whole Artedly Logo"></a>
+                        <a href="home.php" id="logo"><img src="images/logo/logo_dark.png" alt="Whole Artedly Logo"></a>
                     </div>
                     <div class="col-md-8" id="article">
                         <figure>
@@ -210,7 +213,7 @@
                                             <div class="review-footer">
                                                 <h6>'.$row['date'].'</h6>
                                                 <div class="like-dislike">
-                                                    <div="reviewLike">
+                                                    <div class="reviewLike">
                                                         <form method="POST" action="">
                                                             <input hidden type="text" name="id" id="id" value="'.$article_id.'">
                                                             <input hidden type="text" name="reviewId" id="reviewId" value="'.$row['review_id'].'">
@@ -231,7 +234,7 @@
                                                             }
                                                         echo '</form>
                                                     </div>
-                                                    <div="reviewDislike">
+                                                    <div class="reviewDislike">
                                                         <form method="POST" action="">
                                                             <input hidden type="text" name="id" id="id" value="'.$article_id.'">
                                                             <input hidden type="text" name="reviewId" id="reviewId" value="'.$row['review_id'].'">
@@ -251,6 +254,8 @@
                                                                 echo '<button type="submit" class="btn btn-primary" name="reviewDislike" id="reviewDislike"><i class="lni lni-thumbs-down"></i></button>';
                                                             }
                                                         echo '</form>
+                                                </div>
+                                                </div>
                                                 </div>
                                             </div>';
                                             //If the user is the owner of the article or the review allow them to edit or delete the review
@@ -549,8 +554,7 @@
         unset($_POST['delete']);
     }
 
-    //Edit article
-    if(isset($_POST['submitEdit'])){
+    if (isset($_POST['submitEdit'])) {
         $title = $_POST['title'];
         $hashtags = $_POST['hashtags'];
         $category = $_POST['category'];
@@ -559,91 +563,80 @@
         $artist = $_POST['artist'];
         $date = date("Y-m-d");
         $intArticleId = (int)$article_id;
-
-        //Check if all fields are filled
-        if($title == "" || $hashtags == "" || $category == "" || $body == "" || $artPieceTitle == "" || $artist == ""){
+    
+        // Check if all fields are filled
+        if ($title == "" || $hashtags == "" || $category == "" || $body == "" || $artPieceTitle == "" || $artist == "") {
             showError("Please fill in all fields");
         }
-
-        //If there is an image upload the  name of the image otherwise set it to empty
-        //Check if file is of type image
-        if(isset($_FILES['artPieceImage'])){
+    
+        if (isset($_FILES['artPieceImage']) && $_FILES['artPieceImage']['size'] > 0) {
             $target_dir = "images/articles/";
-            $uploadFile = $_FILES['artPieceImage'];
-            $checkSize = getimagesize($uploadFile["tmp_name"][0]);
-            $uploadOK = 1;
-            if($checkSize !== false){
-                //Check if file is larger than 2MB
-                if($uploadFile["size"][0] > 2000000){
-                    echo "File is too large";
-                    $uploadOK = 0;
-                }
-                else{
-                    $uploadOK = 1;
-                }
+    
+            // Handle image upload
+            $target_file = $target_dir . basename($_FILES["artPieceImage"]["name"]);
+            $uploadOk = 1;
+            $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+    
+            // Check if file is a valid image
+            $check = getimagesize($_FILES["artPieceImage"]["tmp_name"]);
+            if ($check === false) {
+                showError("File is not an image.");
             }
-            else{
-                echo "File is not an image";
-                $uploadOK = 0;
+    
+            // Check file size
+            if ($_FILES["artPieceImage"]["size"] > 2000000) { // 2MB
+                showError("File is too large.");
             }
-            $checkFileType = strtolower(pathinfo($uploadFile["name"][0], PATHINFO_EXTENSION));
-            if($checkFileType == "png" || $checkFileType == "jpg" || $checkFileType == "jpeg"){
-                $uploadOK = 1;
+    
+            // Allow only specific file formats (you might need to add more if needed)
+            if ($imageFileType !== "jpg" && $imageFileType !== "png" && $imageFileType !== "jpeg") {
+                showError("Only JPG, JPEG, and PNG files are allowed.");
             }
-            else{
-                echo "File is not a png, jpg or jpeg";
-                $uploadOK = 0;
+    
+            // Generate a unique filename to avoid conflicts
+            $newFileName = uniqid() . '.' . $imageFileType;
+            $target_file = $target_dir . $newFileName;
+    
+            // Upload the image
+            if (move_uploaded_file($_FILES["artPieceImage"]["tmp_name"], $target_file)) {
+                // Image uploaded successfully
+            } else {
+                showError("Error uploading the file.");
             }
-
-            //Get file extension
-            $fileExtension = pathinfo($uploadFile["name"][0], PATHINFO_EXTENSION);
-
-            //Hash filename to  create unique name
-            $hash = hash('md5', $uploadFile["name"][0]);
-            $target_file = $target_dir . $hash . "." . $fileExtension;
-            $filename = $hash . "." . $fileExtension;
-
-            //Upload Image
-            if($uploadOK == 1){
-                if(move_uploaded_file($uploadFile["tmp_name"][0], $target_file)){
-                    echo "File uploaded";
-                }
-                else{
-                    echo "Error uploading file";
-                }
-            }
-
-            //Update article in database
+        }
+    
+        // Update article in the database
+        if (isset($newFileName)) {
+            // If a new image was uploaded
             $sql = "UPDATE articles SET title = '$title', hashtags = '$hashtags', category = '$category', body = '$body', artPieceTitle = '$artPieceTitle', artist = '$artist', artPieceImage = '$target_file' WHERE article_id = '$article_id'";
-            $result = mysqli_query($mysqli, $sql);
-            if(!$result){
-                echo "Error: ".mysqli_error($mysqli);
-            }
-        }
-        else{
-            //Update article in database
+        } else {
+            // If no new image was uploaded
             $sql = "UPDATE articles SET title = '$title', hashtags = '$hashtags', category = '$category', body = '$body', artPieceTitle = '$artPieceTitle', artist = '$artist' WHERE article_id = '$article_id'";
-            $result = mysqli_query($mysqli, $sql);
-            if(!$result){
-                echo "Error: ".mysqli_error($mysqli);
-            }
         }
-        //Tell user that article was updated
+    
+        $result = mysqli_query($mysqli, $sql);
+        if (!$result) {
+            showError("Error: " . mysqli_error($mysqli));
+        }
+    
+        // Tell the user that the article was updated
         echo '
             <script>
                 alert("Article updated");
             </script>
         ';
-
-        //Repost back to article.php with article_id
+    
+        // Redirect back to article.php with the updated article_id
         echo '<form method="POST" action="article.php" id="redirect">
-                <input hidden type="text" name="id" id="id" value="'.$articleId.'">
+                <input hidden type="text" name="id" id="id" value="' . $article_id . '">
                 <script>
                     document.getElementById("redirect").submit();
                 </script>
             </form>';
         unset($_POST['submitEdit']);
     }
+    
+    
 
     //Add article to existing list
     if(isset($_POST['submitExistingList'])){
@@ -1005,10 +998,5 @@
         }
     
         unset($_POST['read']);
-    }
-    
-    
-    
-
-        
+    }     
 ?>

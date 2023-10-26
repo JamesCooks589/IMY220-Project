@@ -14,8 +14,11 @@ body{
 
 .logo{
     width: 25%;
-    height: 100%;
     float: left;
+}
+
+#logo img {
+    width: 100%;
 }
 
 #article{
@@ -115,7 +118,7 @@ pre {
     background-color: #0275d8;
 }
 
-.like-dislike .likes h6 {
+.like-dislike .likes form p {
     display: inline-block;
 }
 
@@ -125,7 +128,27 @@ pre {
     background-color: #0275d8;
 }
 
-.like-dislike .dislikes h6 {
+.like-dislike .dislikes form p {
+    display: inline-block;
+}
+
+.reviewLike{
+    font-size: 1.5em;
+    margin-right: 10px;
+    background-color: #0275d8;
+}
+
+.reviewDislike{
+    font-size: 1.5em;
+    margin-right: 10px;
+    background-color: #0275d8;
+}
+
+.reviewLike form p {
+    display: inline-block;
+}
+
+.reviewDislike form p {
     display: inline-block;
 }
 
@@ -240,6 +263,40 @@ pre {
     background-color: red;
     color: white;
 }
+
+.modal-header{
+    background-color: #2f424f;
+}
+
+.modal-body{
+    background-color: #2f424f;
+}
+
+.modal-body input{
+    background-color: #2f424f;
+    color: white;
+}
+
+.modal-body textarea{
+    background-color: #2f424f;
+    color: white;
+}
+
+.modal-body select{
+    background-color: #2f424f;
+    color: white;
+}
+
+#myBar {
+    width: 0%;
+    height: 4px;
+    background-color: #ffbc00;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 999;
+}
+
 
 
 

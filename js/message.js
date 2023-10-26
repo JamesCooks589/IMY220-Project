@@ -3,6 +3,11 @@ $(document).ready(function () {
     function updateMessages() {
         const user1 = $('#user1').text();
         const user2 = $('#user2').text();
+        //Comma separated list of the 2 usernames
+        const usernames = $('#usernames').text();
+        let username1 = usernames.split(',')[0];
+        let username2 = usernames.split(',')[1];
+
 
         $.ajax({
             type: 'GET',
@@ -16,7 +21,7 @@ $(document).ready(function () {
                 // Append new messages
                 for (const message of data) {
                     const messageHtml = `
-                        <div class="message">
+                        <div class="message ${username1 === message.username ? 'sent' : 'received'}">
                             <p class="message-content">${message.message}</p>
                             <p class="message-info">${message.username}, ${message.date}, ${message.time}</p>
                         </div>

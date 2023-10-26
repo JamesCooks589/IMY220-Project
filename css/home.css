@@ -16,38 +16,35 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 10px; /* Adjust the margin as needed */
+    margin-top: 10px; 
   }
   
-  /* Style the buttons inside the "feeds" div */
+  
   #feeds button {
     margin: 1% 10px; 
   }
   
-  /* Style the banner */
     #banner {
-        width: 100%; /* Adjust the width as needed */
-        height: auto; /* Ensure the image's aspect ratio is maintained */
+        width: 100%; 
+        height: auto; 
     }
     
-    /* Set the top position of the profile picture based on the banner's height */
     #profilePicture {
         position: absolute;
-        /* Adjust the top position based on height of the banner */
         top:  25%;
-        right: 20px; /* Adjust the right position as needed */
+        right: 20px; 
+        cursor: pointer;
     }
     
-    /* Style the profile picture */
     #profile-pic {
-        width: 100px; /* Adjust the width as needed */
-        height: 100px; /* Adjust the height as needed */
+        width: 100px; 
+        height: 100px; 
         border: 2px solid white;
     }
     
-    /* Style the hidden input with user id */
+    
     #userID {
-        display: none; /* Hide the input element */
+        display: none; 
     }
   
   

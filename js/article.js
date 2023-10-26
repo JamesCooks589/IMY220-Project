@@ -40,5 +40,29 @@ $(document).ready(() => {
         }
     });
 
-        
+    //Progress bar for article reading
+    $(window).scroll(updateProgressBar);
+    let scrollMax = 0;
+
+    function updateProgressBar() {
+        const article = $("#article");
+        const progressBar = $("#myBar");
+
+        const scrollTop = $(window).scrollTop();
+        const articleHeight = article.height();
+        const windowHeight = $(window).height();
+
+
+        const scrollPercent = (scrollTop / (articleHeight - windowHeight)) * 100;
+
+        // Ensure the scroll percentage stays within 0% to 100%.
+        const clampedScrollPercent = Math.min(100, Math.max(0, scrollPercent));
+
+        if (clampedScrollPercent > scrollMax) {
+            scrollMax = clampedScrollPercent;
+        }
+
+        // Update the width of the progress bar in percentage.
+        progressBar.css("width", `${scrollMax}%`);
+    }
 });

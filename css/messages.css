@@ -1,0 +1,143 @@
+body{
+    margin: 0;
+    padding: 0;
+    font-family: 'Raleway', sans-serif;
+    background-color: #2f424f;
+    color: white;
+}
+
+h1, h2, h3, h4, h5, h6{
+    font-family: 'Exo 2', sans-serif;
+    background: rgb(214,201,0);
+    background: linear-gradient(90deg, rgba(214,201,0,1) 3%, rgba(38,52,195,1) 59%, rgba(0,212,255,1) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+h1{
+    font-size: 4em;
+}
+
+#logo img {
+    width: 20%;
+    position : fixed;
+    top: 10px;
+    left: 10px;
+}
+
+.profile-picture{
+    width: 5%;
+    border-radius: 50%;
+    border: 2px solid white;
+    position: fixed;
+    top: 10px;
+    right: 10px;
+}
+
+#title{
+    margin-top: 10px;
+    margin-left: 10%;
+    margin-right: 10%;
+    text-align: center;
+}
+
+.main{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+   margin-top: 10px;
+   width: 100%;
+}
+
+.row{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    margin-top: 10px;
+    width: 80%;
+    font-size: 1.5em;
+}
+
+#messages-row{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    margin-top: 10px;
+    width: 80%;
+    font-size: 1.5em;
+}
+
+#messages-container{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 10px;
+}
+
+.sent{
+    background-color: #323ebe;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    display: block;
+    width: 70%;
+    margin-left: 30%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.received{
+    background-color: #e4d93f;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    display: block;
+    min-width: fit-content;
+    width: 70%;
+    margin-right: 30%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.message-content{
+    font-size: 1em;
+}
+
+.message-info{
+    font-size: 0.4em;
+    opacity: 0.8;
+    color: grey;
+}
+
+#send-message-row{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    margin-top: 10px;
+    width: 100%;
+    font-size: 1.5em;
+}
+
+#message-form{
+    width: 100%;
+    margin : 10px 0px;
+}
+
+#message-form textarea{
+    width: 100%;
+    height: 100px;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 1em;
+    resize: none;
+}
+
+#message-form button{
+    float: right;
+}
+
+
+
